@@ -2,7 +2,8 @@
 # 10-601 S14 HW2
 # question 2
 
-import sys
+import sys, re
+from string import lower
 
 fileName = sys.argv[1]
 with open(fileName, 'r') as f:
@@ -10,15 +11,17 @@ with open(fileName, 'r') as f:
 
 # parse
 D = dict()
-for word in line.split(' '):
+words = re.findall('(\S+)',line)
+words = map(lower,words)
+for word in words:
 	if word in D:
-		D[word]+=1;
+		D[word] +=1;
 	else:
 		D[word] = 1;
 
 # output
 output = ""
-for (k,v) in D.iteritems():
+for (k,v) in sorted(D.items()):
 	output = output + k + ':' + str(v) + ','
 
 # remove final comma
