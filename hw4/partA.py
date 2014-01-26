@@ -16,19 +16,25 @@ class FindS(object):
 		self.negClassification = "low"
 		self.matchAllChar = '?'
 		self.hypothesis = Hypothesis(self.dataAttr, self.matchAllChar)
+		self.printEvery = 30
 
 		# files
-		#self.testFileName = sys.argv[2]
+		self.testFileName = sys.argv[1]
 		self.devFileName  = "hw4Data/9Cat-Dev.labeled"
 		self.trainFileName = "hw4Data/9Cat-Train.labeled"
 		self.outFileName = "partA4.txt"
 
-		self.trainingData = FileParser(self.devFileName, self.dataAttr, self.dataClasif).getOutputData()
+		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()
 		self.developmentData = FileParser(self.devFileName, self.dataAttr, self.dataClasif).getOutputData()
+		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif).getOutputData()
 
+		# run program
 		self.printInitialization()
 		with open(self.outFileName, 'w') as f:
-			self.runTraining(f, self.developmentData)
+			self.runTraining(f, self.trainingData)
+		self.runTrial(self.developmentData)
+		self.runClassification(self.testData)
+
 
 	def sizeInputSpace(self):
 		# num choices per attr is two
@@ -36,7 +42,7 @@ class FindS(object):
 
 	def numDigitsConceptSpace(self):
 		# 2^x ~= 10^(x/3.3)
-		return int(math.ceil(10.0 * self.sizeInputSpace() / 3))
+		return int(math.ceil(3.0 * self.sizeInputSpace() / 10))
 
 	def sizeHypotSpace(self):
 		# num choices per attr is two, including ?
@@ -48,15 +54,33 @@ class FindS(object):
  		print self.numDigitsConceptSpace()
  		print self.sizeHypotSpace()
 
-	def runTraining(self, f, data):
-		for dataClasif in data:
-			if dataClasif["classification"] == self.posClassification:
-				self.hypothesis.updateHypothesis( dataClasif["dataVect"] )
+	def runTraining(self, outFile, data):
+		i = 0 # iterator for printing
+		for dataClassified in data:
+			i += 1
+			if dataClassified["classification"] == self.posClassification:
+				self.hypothesis.updateHypothesis( dataClassified["dataVect"] )
 
-				v = dataClasif["dataVect"]
-				f.write( '=' + '\t'.join(v.values()) + '\n')
-				f.write( str(self.hypothesis.printHypothesis(v.keys())) + '\n' )
+			# print every once and awhile
+			if( i % self.printEvery == 0 ):
+				outFile.write( str(self.hypothesis) + '\n' )
 
+	def runTrial(self, data):
+		# print misclassification rate
+		totalIncorrect = 0.0
+
+		for dataClassified in data:
+			classification = self.hypothesis.classify( dataClassified["dataVect"], self.posClassification, self.negClassification )
+			
+			if classification != dataClassified["classification"]:
+				totalIncorrect += 1
+
+		print round( totalIncorrect/len(data), 2)
+
+	def runClassification(self, data):
+		# print classification
+		for dataClassified in data:
+			print self.hypothesis.classify( dataClassified["dataVect"], self.posClassification, self.negClassification )
 
 partA = FindS()
 	
