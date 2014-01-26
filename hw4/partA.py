@@ -2,38 +2,62 @@
 # 10-601 Spring 2014
 # HW 4
 
-import re
+import sys, math
+from FileParser import FileParser
+from Hypothesis import Hypothesis
 
-class FileParser(object):
-	"""FileParser reads in input files and converts to dataVect"""
-	def __init__(self, fileName, dataAttr, dataClasif, classified = True):
-		self.fileName = fileName
-		self.dataAttr = dataAttr
-		self.dataClasif = dataClasif
-		self.classified = classified
+class FindS(object):
+	"""FindS algorithm implementation"""
+	def __init__(self):
+		self.dataAttr = ["Gender", "Age", "Student?", "PreviouslyDeclined?", 
+			"HairLength", "Employed?", "TypeOfColateral", "FirstLoan", "LifeInsurance"]
+		self.dataClasif = "Risk"
+		self.posClassification = "high"
+		self.negClassification = "low"
+		self.matchAllChar = '?'
+		self.hypothesis = Hypothesis(self.dataAttr, self.matchAllChar)
 
-		self.outputData = []
+		# files
+		#self.testFileName = sys.argv[2]
+		self.devFileName  = "hw4Data/9Cat-Dev.labeled"
+		self.trainFileName = "hw4Data/9Cat-Train.labeled"
+		self.outFileName = "partA4.txt"
 
-		# open file and parse
-		with open(fileName, 'r') as f:
-			self.getOuputData(f)
-		print self.outputData
+		self.trainingData = FileParser(self.devFileName, self.dataAttr, self.dataClasif).getOutputData()
+		self.developmentData = FileParser(self.devFileName, self.dataAttr, self.dataClasif).getOutputData()
 
-	def getOuputData(self, f):
-		for line in f:
-			self.outputData.append( self.convertDataLine(line) )
+		self.printInitialization()
+		with open(self.outFileName, 'w') as f:
+			self.runTraining(f, self.developmentData)
 
-	def convertDataLine(self, line):
-		pairs = re.findall(r"(\S+) (\S+)", line)
-		dataVect = dict(pairs)
-		if( self.classified ):
-			# data file included classification
-			classifiedVect = dict()
-			classifiedVect['classVect'] = dataVect[self.dataClasif]
-			del dataVect[self.dataClasif]
-			classifiedVect['dataVect'] = dataVect
-			return classifiedVect
-		else: 
-			return dataVect
+	def sizeInputSpace(self):
+		# num choices per attr is two
+		return 2**len(self.dataAttr)
 
-FileParser("hw4Data/4Cat-Dev.labeled", ["Gender", "Age", "Student?", "PreviouslyDeclined?"], "Risk")
+	def numDigitsConceptSpace(self):
+		# 2^x ~= 10^(x/3.3)
+		return int(math.ceil(10.0 * self.sizeInputSpace() / 3))
+
+	def sizeHypotSpace(self):
+		# num choices per attr is two, including ?
+		# includes null hypot
+		return 3**len(self.dataAttr) + 1
+
+ 	def printInitialization(self):
+ 		print self.sizeInputSpace()
+ 		print self.numDigitsConceptSpace()
+ 		print self.sizeHypotSpace()
+
+	def runTraining(self, f, data):
+		for dataClasif in data:
+			if dataClasif["classification"] == self.posClassification:
+				self.hypothesis.updateHypothesis( dataClasif["dataVect"] )
+
+				v = dataClasif["dataVect"]
+				f.write( '=' + '\t'.join(v.values()) + '\n')
+				f.write( str(self.hypothesis.printHypothesis(v.keys())) + '\n' )
+
+
+partA = FindS()
+	
+

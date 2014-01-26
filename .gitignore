@@ -3,3 +3,4 @@
 *.tgz
 *.tar.gz
 ._*
+*.pyc
