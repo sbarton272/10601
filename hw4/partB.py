@@ -8,7 +8,7 @@ from FileParser import FileParser
 class LTE(object):
 	"""FindS algorithm implementation"""
 	def __init__(self):
-		self.dataAttr = ["Gender", "Age", "Student?", "PreviouslyDeclined?"]
+		self.dataAttrOrd = ["Gender", "Age", "Student?", "PreviouslyDeclined?"]
 		self.dataAttrOpt = {"Gender": ["Male", "Female"], "Age": ["Young", "Old"], "Student?": ["Yes", "No"] , "PreviouslyDeclined?": ["Yes", "No"]}
 		self.dataClasif = "Risk"
 		self.posClassification = "high"
@@ -20,8 +20,9 @@ class LTE(object):
 		self.testFileName = sys.argv[1]
 		self.trainFileName = "4Cat-Train.labeled"
 
-		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()
-		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif, False).getOutputData()
+		# data
+		self.trainingData = FileParser(self.trainFileName, self.dataClasif).getOutputData()
+		self.testData = FileParser(self.testFileName, self.dataClasif, False).getOutputData() # not classified
 
 		# run program
 		self.printInitialization()
@@ -31,7 +32,7 @@ class LTE(object):
 
 	def sizeInputSpace(self):
 		# num choices per attr is two
-		return 2**len(self.dataAttr)
+		return 2**len(self.dataAttrOrd)
 
 	def sizeConceptSpace(self):
 		return 2**self.sizeInputSpace()
@@ -42,13 +43,13 @@ class LTE(object):
 
  	def populateVS(self):
  		# populate VS using a binary representation of the data
- 		# generate all binary strings using a trick with product
+ 		# generate all binary strings using a trick with itertools product
 		return ["".join(prod) for prod in itertools.product("01", repeat = self.sizeInputSpace())]
 
 	def getDataIndex(self, data):
-		# compute index by encoding values to binary
+		# compute index of hypot output for given data by encoding values to binary
 		i = 0
-		for attr in self.dataAttr:
+		for attr in self.dataAttrOrd:
 			valIndex = self.dataAttrOpt[attr].index(data[attr]) # value mapped to 0/1
 			i = (i << 1) + valIndex # create index bit by bit
 		return i
@@ -69,19 +70,23 @@ class LTE(object):
 		return hypot[dataIndex] == '1'
 
 	def runTraining(self, data):
-		# iter through all hypotheses and eliminate those that do not match the training data
-		# modified VS
+		# iter through all hypotheses and eliminate those that do not match the 
+		# training data, modifies the versionSpace
 		newVS = []
+
 		for hypot in self.versionSpace:
 			valid = True
+
+			# go elem by elem until hypot refuted or accepted
 			for dataClassified in data:
-				# move to next if no match
 				if not self.matchHypot(hypot, dataClassified):
 					valid = False
-					break
+					break # move to next hypot if no match
+
 			# include hypot in VS if matched every piece of training data
 			if valid:
 				newVS.append(hypot)
+
 		self.versionSpace = newVS
 		print len(newVS)
 
@@ -90,6 +95,7 @@ class LTE(object):
 		for dataVect in data:
 			votePos = 0
 			voteNeg = 0
+			# tally votes
 			for hypot in self.versionSpace:
 				if self.classifyPos(hypot, dataVect):
 					votePos += 1

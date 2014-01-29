@@ -6,9 +6,8 @@ import re
 
 class FileParser(object):
 	"""FileParser reads in input files and converts to dataVect"""
-	def __init__(self, fileName, dataAttr, dataClasif, classified = True):
+	def __init__(self, fileName, dataClasif, classified = True):
 		self.fileName = fileName
-		self.dataAttr = dataAttr
 		self.dataClasif = dataClasif
 		self.classified = classified
 
@@ -25,8 +24,9 @@ class FileParser(object):
 	def convertDataLine(self, line):
 		pairs = re.findall(r"(\S+) (\S+)", line)
 		dataVect = dict(pairs)
+		
 		if( self.classified ):
-			# data file included classification
+			# data file included classification so seperate
 			classifiedVect = dict()
 			classifiedVect['classification'] = dataVect[self.dataClasif]
 			del dataVect[self.dataClasif]

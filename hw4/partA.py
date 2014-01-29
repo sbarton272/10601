@@ -10,11 +10,13 @@ class FindS(object):
 	"""FindS algorithm implementation"""
 	def __init__(self):
 		self.dataAttr = ["Gender", "Age", "Student?", "PreviouslyDeclined?", 
-			"HairLength", "Employed?", "TypeOfColateral", "FirstLoan", "LifeInsurance"]
+			"HairLength", "Employed?", "TypeOfColateral", "FirstLoan", 
+			"LifeInsurance"]
 		self.dataClasif = "Risk"
 		self.posClassification = "high"
 		self.negClassification = "low"
 		self.matchAllChar = '?'
+
 		self.hypothesis = ConjHypothesis(self.dataAttr, self.matchAllChar)
 		self.printEvery = 30
 
@@ -24,9 +26,10 @@ class FindS(object):
 		self.trainFileName = "9Cat-Train.labeled"
 		self.outFileName = "partA4.txt"
 
-		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()
-		self.developmentData = FileParser(self.devFileName, self.dataAttr, self.dataClasif).getOutputData()
-		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif, False).getOutputData()
+		# parse data
+		self.trainingData = FileParser(self.trainFileName, self.dataClasif).getOutputData()
+		self.developmentData = FileParser(self.devFileName, self.dataClasif).getOutputData()
+		self.testData = FileParser(self.testFileName, self.dataClasif, False).getOutputData()
 
 		# run program
 		self.printInitialization()
@@ -41,7 +44,7 @@ class FindS(object):
 		return 2**len(self.dataAttr)
 
 	def numDigitsConceptSpace(self):
-		# 2^x ~= 10^(x/3.3)
+		# 2^x ~= 10^(x/3.3) add one to acount for digit in front
 		return int(math.ceil(3.0 * self.sizeInputSpace() / 10)) + 1
 
 	def sizeHypotSpace(self):
@@ -70,7 +73,8 @@ class FindS(object):
 		totalIncorrect = 0.0
 
 		for dataClassified in data:
-			classification = self.hypothesis.classify( dataClassified["dataVect"], self.posClassification, self.negClassification )
+			classification = self.hypothesis.classify( dataClassified["dataVect"],
+								 self.posClassification, self.negClassification )
 			
 			if classification != dataClassified["classification"]:
 				totalIncorrect += 1
@@ -80,7 +84,8 @@ class FindS(object):
 	def runClassification(self, data):
 		# print classification
 		for dataVect in data:
-			print self.hypothesis.classify( dataVect, self.posClassification, self.negClassification )
+			print self.hypothesis.classify( dataVect, self.posClassification, 
+											self.negClassification )
 
 partA = FindS()
 	
