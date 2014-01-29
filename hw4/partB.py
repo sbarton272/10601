@@ -13,25 +13,22 @@ class LTE(object):
 		self.dataClasif = "Risk"
 		self.posClassification = "high"
 		self.negClassification = "low"
-		self.versionSpace = self.populateVS()
+		self.versionSpace = self.populateVS() # does not include NULL hypot
 		self.printEvery = 30
 
 		# files
 		self.testFileName = "hw4Data/4Cat-Dev.labeled" #sys.argv[1]
-		self.devFileName  = "hw4Data/4Cat-Dev.labeled"
 		self.trainFileName = "hw4Data/4Cat-Train.labeled"
 		self.outFileName = "partB5.txt"
 
 		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()
-		self.developmentData = FileParser(self.devFileName, self.dataAttr, self.dataClasif).getOutputData()
 		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif).getOutputData()
 
 		# run program
 		self.printInitialization()
-		# with open(self.outFileName, 'w') as f:
-		# 	self.runTraining(f, self.trainingData)
-		# self.runTrial(self.developmentData)
-		# self.runClassification(self.testData)
+		with open(self.outFileName, 'w') as f:
+		 	self.runTraining(f, self.developmentData) # update VS
+		self.runClassification(self.testData)
 
 
 	def sizeInputSpace(self):
@@ -50,46 +47,43 @@ class LTE(object):
  		# generate all binary strings using a trick with product
 		return ["".join(prod) for prod in itertools.product("01", repeat = self.sizeInputSpace())]
 
-	def matchHypot(self, hypot, data):
-		# return True if the data matches the hypothesis, False otherwise
-		dataIndex = self.getDataIndex(data) # basically a hash to determine which input it is
-
-		# compare classification to hypot's classification, 1 is pos for hypot 
-		if data["classification"] == self.posClassification:
-			return hypot[dataIndex] == 1
-		else:
-			return hypot[dataIndex] == 0
-
 	def getDataIndex(self, data):
 		# compute index by encoding values to binary
 		i = 0
 		for attr in self.dataAttr:
-			valIndex = self.dataAttrOpt[attr].find(data[attr]) # value mapped to 0/1
+			valIndex = self.dataAttrOpt[attr].index(data[attr]) # value mapped to 0/1
 			i = (i << 1) + valIndex # create index bit by bit
 		return i
 
-	def runTraining(self, outFile, data):
-		i = 0 # iterator for printing
-		for dataClassified in data:
-			i += 1
-			if dataClassified["classification"] == self.posClassification:
-				self.hypothesis.updateHypothesis( dataClassified["dataVect"] )
+	def matchHypot(self, hypot, dataClassified):
+		# return True if the data matches the hypothesis, False otherwise
+		dataIndex = self.getDataIndex( dataClassified["dataVect"] ) # basically a hash to determine which input it is
 
-			# print every once and awhile
-			if( i % self.printEvery == 0 ):
-				outFile.write( str(self.hypothesis) + '\n' )
+		# compare classification to hypot's classification, 1 is pos for hypot 
+		if dataClassified["classification"] == self.posClassification:
+			return hypot[dataIndex] == '1'
+		else:
+			return hypot[dataIndex] == '0'
+
+	def runTraining(self, outFile, data):
+		# iter through all hypotheses and eliminate those that do not match the training data
+		# modified VS
+		newVS = []
+		for hypot in self.versionSpace:
+			valid = True
+			for dataClassified in data:
+				# move to next if no match
+				if not self.matchHypot(hypot, dataClassified):
+					valid = False
+					break
+			# include hypot in VS if matched every piece of training data
+			if valid:
+				newVS.append(hypot)
+		self.versionSpace = newVS
+		print len(newVS)
 
 	def runTrial(self, data):
-		# print misclassification rate
-		totalIncorrect = 0.0
-
-		for dataClassified in data:
-			classification = self.hypothesis.classify( dataClassified["dataVect"], self.posClassification, self.negClassification )
-			
-			if classification != dataClassified["classification"]:
-				totalIncorrect += 1
-
-		print round( totalIncorrect/len(data), 2)
+		return
 
 	def runClassification(self, data):
 		# print classification
