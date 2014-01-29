@@ -1,0 +1,5 @@
+Gender Male	Age Young	Student? No	PreviouslyDeclined? No
+Gender Male	Age Young	Student? Yes	PreviouslyDeclined? Yes
+Gender Female	Age Old	Student? No	PreviouslyDeclined? No
+Gender Male	Age Old	Student? No	PreviouslyDeclined? Yes
+Gender Female	Age Young	Student? No	PreviouslyDeclined? No
