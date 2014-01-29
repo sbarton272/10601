@@ -4,7 +4,7 @@
 
 import sys, math
 from FileParser import FileParser
-from Hypothesis import Hypothesis
+from Hypothesis import ConjHypothesis
 
 class FindS(object):
 	"""FindS algorithm implementation"""
@@ -15,7 +15,7 @@ class FindS(object):
 		self.posClassification = "high"
 		self.negClassification = "low"
 		self.matchAllChar = '?'
-		self.hypothesis = Hypothesis(self.dataAttr, self.matchAllChar)
+		self.hypothesis = ConjHypothesis(self.dataAttr, self.matchAllChar)
 		self.printEvery = 30
 
 		# files
@@ -26,7 +26,7 @@ class FindS(object):
 
 		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()
 		self.developmentData = FileParser(self.devFileName, self.dataAttr, self.dataClasif).getOutputData()
-		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif).getOutputData()
+		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif, False).getOutputData()
 
 		# run program
 		self.printInitialization()
@@ -42,7 +42,7 @@ class FindS(object):
 
 	def numDigitsConceptSpace(self):
 		# 2^x ~= 10^(x/3.3)
-		return int(math.ceil(3.0 * self.sizeInputSpace() / 10))
+		return int(math.ceil(3.0 * self.sizeInputSpace() / 10)) + 1
 
 	def sizeHypotSpace(self):
 		# num choices per attr is two, including ?
