@@ -1,7 +1,14 @@
-Q1. Did you receive any help whatsoever from anyone in solving this assignment? Yes / No. 
-If you answered ‘yes’, give full details? (e.g.“Jane explained to me what is asked in Question 3.4").
+﻿Q1. Did you receive any help whatsoever from anyone in solving this assignment? 
+Yes 
+
+Justin Frye (jmfrye) and I worked on a whiteboard to practice Find-S and List the Eliminate. We created a sample binary dataset and went through the steps of the algoithm together. We did not talk about code or the assignment data sets.
 
 
 
-Q2. Did you give any help whatsoever to anyone in solving this assignment? Yes / No. 
-If you answered ‘yes’, give full details? (e.g. “I pointed Joe to section 2.3 to help him with Question 2").
+
+
+
+Q2. Did you give any help whatsoever to anyone in solving this assignment? 
+Yes
+
+See above

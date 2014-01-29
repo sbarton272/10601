@@ -19,9 +19,9 @@ class FindS(object):
 		self.printEvery = 30
 
 		# files
-		self.testFileName = "hw4Data/9Cat-Test.labeled" #sys.argv[1]
-		self.devFileName  = "hw4Data/9Cat-Dev.labeled"
-		self.trainFileName = "hw4Data/9Cat-Train.labeled"
+		self.testFileName = sys.argv[1]
+		self.devFileName  = "9Cat-Dev.labeled"
+		self.trainFileName = "9Cat-Train.labeled"
 		self.outFileName = "partA4.txt"
 
 		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()

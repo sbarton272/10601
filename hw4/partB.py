@@ -17,8 +17,8 @@ class LTE(object):
 		self.printEvery = 30
 
 		# files
-		self.testFileName = "hw4Data/4Cat-Test.labeled" #sys.argv[1]
-		self.trainFileName = "hw4Data/4Cat-train.labeled"
+		self.testFileName = sys.argv[1]
+		self.trainFileName = "4Cat-Train.labeled"
 
 		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()
 		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif, False).getOutputData()
