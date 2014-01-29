@@ -19,7 +19,7 @@ class FindS(object):
 		self.printEvery = 30
 
 		# files
-		self.testFileName = sys.argv[1]
+		self.testFileName = "hw4Data/9Cat-Test.labeled" #sys.argv[1]
 		self.devFileName  = "hw4Data/9Cat-Dev.labeled"
 		self.trainFileName = "hw4Data/9Cat-Train.labeled"
 		self.outFileName = "partA4.txt"
@@ -79,8 +79,8 @@ class FindS(object):
 
 	def runClassification(self, data):
 		# print classification
-		for dataClassified in data:
-			print self.hypothesis.classify( dataClassified["dataVect"], self.posClassification, self.negClassification )
+		for dataVect in data:
+			print self.hypothesis.classify( dataVect, self.posClassification, self.negClassification )
 
 partA = FindS()
 	

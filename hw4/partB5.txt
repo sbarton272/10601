@@ -1,0 +1,5 @@
+Spencer Barton
+10-601 Spring 2014
+HW 4
+
+The List-Then-Eliminate ran fairly quickly thanks to the small number of attributes. it came up with a fairly small vector space but maintained some generality. That said the training data did not map well to the given development data. The development data votes were all split. Because so few attributes were used it was more difficult to classify the data.

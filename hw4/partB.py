@@ -17,17 +17,15 @@ class LTE(object):
 		self.printEvery = 30
 
 		# files
-		self.testFileName = "hw4Data/4Cat-Dev.labeled" #sys.argv[1]
-		self.trainFileName = "hw4Data/4Cat-Train.labeled"
-		self.outFileName = "partB5.txt"
+		self.testFileName = "hw4Data/4Cat-Test.labeled" #sys.argv[1]
+		self.trainFileName = "hw4Data/4Cat-train.labeled"
 
 		self.trainingData = FileParser(self.trainFileName, self.dataAttr, self.dataClasif).getOutputData()
-		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif).getOutputData()
+		self.testData = FileParser(self.testFileName, self.dataAttr, self.dataClasif, False).getOutputData()
 
 		# run program
 		self.printInitialization()
-		with open(self.outFileName, 'w') as f:
-		 	self.runTraining(f, self.developmentData) # update VS
+		self.runTraining(self.trainingData) # update VS
 		self.runClassification(self.testData)
 
 
@@ -65,7 +63,12 @@ class LTE(object):
 		else:
 			return hypot[dataIndex] == '0'
 
-	def runTraining(self, outFile, data):
+	def classifyPos(self, hypot, dataVect):
+		# return pos or neg classification
+		dataIndex = self.getDataIndex(dataVect)
+		return hypot[dataIndex] == '1'
+
+	def runTraining(self, data):
 		# iter through all hypotheses and eliminate those that do not match the training data
 		# modified VS
 		newVS = []
@@ -82,12 +85,16 @@ class LTE(object):
 		self.versionSpace = newVS
 		print len(newVS)
 
-	def runTrial(self, data):
-		return
-
 	def runClassification(self, data):
-		# print classification
-		for dataClassified in data:
-			print self.hypothesis.classify( dataClassified["dataVect"], self.posClassification, self.negClassification )
+		# print classification vote with current VS
+		for dataVect in data:
+			votePos = 0
+			voteNeg = 0
+			for hypot in self.versionSpace:
+				if self.classifyPos(hypot, dataVect):
+					votePos += 1
+				else:
+					voteNeg += 1
+			print str(votePos) + ' ' + str(voteNeg)
 
 partA = LTE()
