@@ -1,14 +1,11 @@
 ﻿Q1. Did you receive any help whatsoever from anyone in solving this assignment? 
 Yes 
-
-Justin Frye (jmfrye) and I worked on a whiteboard to practice Find-S and List the Eliminate. We created a sample binary dataset and went through the steps of the algoithm together. We did not talk about code or the assignment data sets.
 
 
+Justin Frye (jmfrye) and I worked on a whiteboard to practice Find-S and List the Eliminate. We created a sample binary dataset and went through the steps of the algoithm together. We did not talk about code or the assignment data sets. We discussed the diffferences between the two algorithms and pulled examples from the book.
 
 
-
-
-Q2. Did you give any help whatsoever to anyone in solving this assignment? 
+Q2. Did you give any help whatsoever to anyone in solving this assignment? 
 Yes
 
 See above

@@ -2,4 +2,6 @@ Spencer Barton
 10-601 Spring 2014
 HW 4
 
-The List-Then-Eliminate ran fairly quickly thanks to the small number of attributes. it came up with a fairly small vector space but maintained some generality. That said the training data did not map well to the given development data. The development data votes were all split. Because so few attributes were used it was more difficult to classify the data.
+The List-Then-Eliminate ran fairly quickly thanks to the small number of attributes. It came up with a fairly small vector space but maintained some generality. That said the training data did not map well to the given development data. The development data votes were all split which was not a good result. Because so few attributes were used it was more difficult to classify the data. List-Then-Eliminate used all the data in its classification but as demonstrated here that is sometimes not sucessful.
+
+Find-S on the other hand was much more conclusive with its classifications. Because this algorithm came with some biases it was able to develop a final hypothesis and to classify the test data. Find-S was also faster. However Find-S ignored all the negative examples so it is possible that the final hypothesis was invalid.
