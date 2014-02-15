@@ -1,0 +1,5 @@
+Spencer Barton
+10-601 Spring 2011
+HW 6 2/19/14
+
+Decision trees should work fairly well with both datasets as each attribute is binary so the trees will stay fairly compact. For the education and music datasets I would also guess that there are certain attributes that provide more mutual information with the classification which can lead to efficient branch selection.
