@@ -6,7 +6,7 @@
 import sys, csv, math
 
 # arg 1 is file
-fileName = self.testFileName = sys.argv[1] 
+fileName = sys.argv[1] 
 
 # label settings
 plusLabel  = 'yes'
@@ -19,14 +19,14 @@ numMinus = 0.0
 
 with open(fileName, 'r') as f:
 
-	# assume header on 1st row
-	reader = csv.DictReader(f)
+    # assume header on 1st row
+    reader = csv.DictReader(f)
 
-	for r in reader:
-		if r[classificationAttr] == plusLabel:
-			numPlus += 1
-		else:
-			numMinus += 1
+    for r in reader:
+        if r[classificationAttr] == plusLabel:
+            numPlus += 1
+        else:
+            numMinus += 1
 
 # output entropy
 probP = numPlus / (numPlus + numMinus)
@@ -36,4 +36,3 @@ print "entropy: ", round(H,3)
 
 # output error: prob minus 
 print "error: ", round(probM,3)
-
