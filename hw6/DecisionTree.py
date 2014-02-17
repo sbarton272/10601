@@ -200,7 +200,7 @@ class Node(object):
 #=======================================
 
 # TESTING
-with open("example2.csv", 'r') as f:
+with open("example1.csv", 'r') as f:
 	# assume header on 1st row
 	reader = csv.DictReader(f)
 
