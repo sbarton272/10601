@@ -200,7 +200,7 @@ class Node(object):
 #=======================================
 
 # TESTING
-with open("example1.csv", 'r') as f:
+with open("example2.csv", 'r') as f:
 	# assume header on 1st row
 	reader = csv.DictReader(f)
 
@@ -211,5 +211,5 @@ with open("example1.csv", 'r') as f:
 		ex["Attrs"]   = ln
 		examples.append(ex)
 
-test = Node(2, examples, "yes", "no", 1.0)
+test = Node(2, examples, "yes", "no", .1)
 test.printTree()
