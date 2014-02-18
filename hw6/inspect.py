@@ -9,9 +9,7 @@ import sys, csv, math
 fileName = sys.argv[1] 
 
 # label settings
-plusLabel  = 'yes'
-minusLabel = 'no'
-classificationAttr = 'hit'
+classificationOpts = {'hit': 'yes', 'grade': 'A'}
 
 # vars
 numPlus  = 0.0
@@ -23,6 +21,11 @@ with open(fileName, 'r') as f:
     reader = csv.DictReader(f)
 
     for r in reader:
+        keys = r.keys()
+        key = list(set(keys).intersection( set(classificationOpts.keys()) ))[0]
+        plusLabel  = classificationOpts[key]
+        classificationAttr = key
+
         if r[classificationAttr] == plusLabel:
             numPlus += 1
         else:

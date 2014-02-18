@@ -282,5 +282,20 @@ class Node(object):
 trainFile = sys.argv[1]
 testFile  = sys.argv[2]
 
-tree = DecisionTree(trainFile)
+# hard coded music vs education
+if 'music' in trainFile:
+	targetLabel = "hit"
+	targetPlus = "yes"
+	targetMinus = "no"
+elif 'example' in trainFile:
+	targetLabel = "hit"
+	targetPlus = "yes"
+	targetMinus = "no"
+elif 'education' in trainFile:
+	targetLabel = "grade"
+	targetPlus = "A"
+	targetMinus = "notA"
+
+tree = DecisionTree(trainFile, targetLabel = targetLabel, 
+					targetPlus = targetPlus, targetMinus = targetMinus)
 tree.runHWOutput(testFile)
