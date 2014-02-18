@@ -6,12 +6,63 @@
 import math, sys, csv
 
 FLOAT_EPSILON = 0.0001
+EX_TRAIN = "example1.csv"
+EX_TEST  = "example2.csv"
 
 class DecisionTree(object):
 	"""DecisionTree for performing algorithm"""
-	def __init__(self, arg):
-		super(DecisionTree, self).__init__()
-		self.arg = arg
+	def __init__(self, trainFileName, targetLabel = "hit", targetPlus = "yes", 
+				 targetMinus = "no", targetKey = "Target", attrKey = "Attrs", 
+				 minEntropy = .1, maxDepth = 2):
+		
+		# data reprentation keys
+		self.targetKey = targetKey
+		self.attrKey   = attrKey
+
+		# Training
+		trainingExamples = self._parseInputFile(trainFileName, targetLabel)
+		self.trainingExamples = trainingExamples
+		self.root = Node(maxDepth, trainingExamples, targetPlus, targetMinus, minEntropy)
+		
+	def printTree(self):
+		"""Print trained decision tree"""
+		self.root.printTree()
+
+	def getTrainingError(self):
+		"Get error with training data and trained tree"
+		return self._calcClassificationError(self.trainingExamples)
+
+	def getClassificationError(self, testDataFilePath, targetLabel):
+		"Run classified test data on the decision tree"
+		examples = self._parseInputFile(testDataFilePath, targetLabel)
+		return self._calcClassificationError(examples)
+
+	def _calcClassificationError(self, examples):
+		"""Calculate the classification error for the data in the tree"""
+		totalExamples = float(len(examples))
+		errors = 0.0
+		for ex in examples:
+			if self.root.classify(ex) != ex[self.targetKey]:
+				errors += 1
+		return errors / totalExamples
+
+	def _parseInputFile(self, filePath, targetLabel):
+		"""Open and parse file into dict of form: {Target: , Attrs: {...}} 
+			Needs targetLabel to know which label to take as the target.
+			Assumes that the data file is a csv with label headers.
+			Returns a list of the data in above dict form"""
+		with open(filePath, 'r') as f:
+			# assume header on 1st row
+			reader = csv.DictReader(f)
+			# parse lines into example list
+			examples = []
+			for ln in reader:
+				ex = {}
+				ex["Target"] = ln.pop(targetLabel) # destructive
+				ex["Attrs"]   = ln
+				examples.append(ex)
+		return examples
+
 		
 #=================================================================
 # Binary Node
@@ -199,17 +250,3 @@ class Node(object):
 # Run program
 #=======================================
 
-# TESTING
-with open("example2.csv", 'r') as f:
-	# assume header on 1st row
-	reader = csv.DictReader(f)
-
-	examples = []
-	for ln in reader:
-		ex = {}
-		ex["Target"] = ln.pop("hit") # destructive
-		ex["Attrs"]   = ln
-		examples.append(ex)
-
-test = Node(2, examples, "yes", "no", .1)
-test.printTree()
