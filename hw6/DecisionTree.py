@@ -6,8 +6,8 @@
 import math, sys, csv
 
 FLOAT_EPSILON = 0.0001
-EX_TRAIN = "example1.csv"
-EX_TEST  = "example2.csv"
+EX_1 = "example1.csv"
+EX_2  = "example2.csv"
 
 class DecisionTree(object):
 	"""DecisionTree for performing algorithm"""
@@ -18,9 +18,10 @@ class DecisionTree(object):
 		# data reprentation keys
 		self.targetKey = targetKey
 		self.attrKey   = attrKey
+		self.targetLabel = targetLabel
 
 		# Training
-		trainingExamples = self._parseInputFile(trainFileName, targetLabel)
+		trainingExamples = self._parseInputFile(trainFileName)
 		self.trainingExamples = trainingExamples
 		self.root = Node(maxDepth, trainingExamples, targetPlus, targetMinus, minEntropy)
 		
@@ -32,13 +33,19 @@ class DecisionTree(object):
 		"Get error with training data and trained tree"
 		return self._calcClassificationError(self.trainingExamples)
 
-	def getClassificationError(self, testDataFilePath, targetLabel):
+	def getClassificationError(self, testDataFilePath):
 		"Run classified test data on the decision tree"
-		examples = self._parseInputFile(testDataFilePath, targetLabel)
+		examples = self._parseInputFile(testDataFilePath)
 		return self._calcClassificationError(examples)
 
+	def runHWOutput(self, testDataFilePath):
+		self.printTree()
+		print "error (train): " + str(round(self.getTrainingError(),2))
+		print "error (test): " + str(round(self.getClassificationError(testDataFilePath),2))
+
 	def _calcClassificationError(self, examples):
-		"""Calculate the classification error for the data in the tree"""
+		"""Calculate the classification error for the data in the tree.
+			Assumes test data in same format as training data"""
 		totalExamples = float(len(examples))
 		errors = 0.0
 		for ex in examples:
@@ -46,7 +53,7 @@ class DecisionTree(object):
 				errors += 1
 		return errors / totalExamples
 
-	def _parseInputFile(self, filePath, targetLabel):
+	def _parseInputFile(self, filePath):
 		"""Open and parse file into dict of form: {Target: , Attrs: {...}} 
 			Needs targetLabel to know which label to take as the target.
 			Assumes that the data file is a csv with label headers.
@@ -58,8 +65,8 @@ class DecisionTree(object):
 			examples = []
 			for ln in reader:
 				ex = {}
-				ex["Target"] = ln.pop(targetLabel) # destructive
-				ex["Attrs"]   = ln
+				ex[self.targetKey] = ln.pop(self.targetLabel) # destructive
+				ex[self.attrKey]   = ln
 				examples.append(ex)
 		return examples
 
@@ -205,7 +212,7 @@ class Node(object):
 
 	def isLeaf(self):
 		"isLeaf if children are non-existant"
-		return (self.lChild == None) and (self.rChild == None)
+		return self.children == None
 
 	def isRoot(self):
 		"isRoot if not nodeAttr"
@@ -250,3 +257,8 @@ class Node(object):
 # Run program
 #=======================================
 
+test1 = DecisionTree(EX_1)
+test1.runHWOutput(EX_2)
+
+test2 = DecisionTree(EX_2)
+test2.runHWOutput(EX_1)
