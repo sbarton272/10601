@@ -1,0 +1,5 @@
+Spencer Barton
+10-601 Spring 2011
+HW 6 2/19/14
+
+It turns out that the music data trained better then the education data. The education data did end up splitting on the final as I predicted. The music data split first on year and second on jazz/rock. This was not what I predicted but interesting nonetheless as it promoted the idea that jazz was the popular music pre-1950 and rock post-1950.

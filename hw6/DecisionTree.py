@@ -257,8 +257,30 @@ class Node(object):
 # Run program
 #=======================================
 
-test1 = DecisionTree(EX_1)
-test1.runHWOutput(EX_2)
+# print "Test 1"
+# test1 = DecisionTree(EX_1)
+# test1.runHWOutput(EX_2)
+# print "==========="
 
-test2 = DecisionTree(EX_2)
-test2.runHWOutput(EX_1)
+# print "Test 2"
+# test2 = DecisionTree(EX_2)
+# test2.runHWOutput(EX_1)
+# print "==========="
+
+# print "Education"
+# ed = DecisionTree("education_train.csv", targetLabel = "grade", targetPlus = "A",
+# 					targetMinus = "notA")
+# ed.runHWOutput("education_test.csv")
+# print "==========="
+
+# print "Music"
+# ed = DecisionTree("music_train.csv", targetLabel = "hit", targetPlus = "yes",
+# 					targetMinus = "no")
+# ed.runHWOutput("music_test.csv")
+# print "==========="
+
+trainFile = sys.argv[1]
+testFile  = sys.argv[2]
+
+tree = DecisionTree(trainFile)
+tree.runHWOutput(testFile)
