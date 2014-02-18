@@ -35,7 +35,7 @@ with open(fileName, 'r') as f:
 probP = numPlus / (numPlus + numMinus)
 probM = numMinus / (numPlus + numMinus)
 H = -probP * math.log(probP, 2) - probM * math.log(probM, 2)
-print "entropy: ", round(H,3)
+print "entropy:", round(H,3)
 
 # output error: prob minus 
-print "error: ", round(probM,3)
+print "error:", round(probM,3)
