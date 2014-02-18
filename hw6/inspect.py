@@ -9,11 +9,10 @@ import sys, csv, math
 fileName = sys.argv[1] 
 
 # label settings
-classificationOpts = {'hit': 'yes', 'grade': 'A'}
+classificationOpts = set(['hit', 'grade'])
 
 # vars
-numPlus  = 0.0
-numMinus = 0.0
+labelCounts = {}
 
 with open(fileName, 'r') as f:
 
@@ -22,14 +21,16 @@ with open(fileName, 'r') as f:
 
     for r in reader:
         keys = r.keys()
-        key = list(set(keys).intersection( set(classificationOpts.keys()) ))[0]
-        plusLabel  = classificationOpts[key]
-        classificationAttr = key
+        key = list(set(keys).intersection( classificationOpts ))[0]
 
-        if r[classificationAttr] == plusLabel:
-            numPlus += 1
-        else:
-            numMinus += 1
+        label = r[key]
+        if label not in labelCounts:
+            labelCounts[label] = 0
+        labelCounts[label] += 1
+
+assert( len(labelCounts.keys()) == 2 )
+numPlus  = float(max(labelCounts.values()))
+numMinus = float(min(labelCounts.values()))
 
 # output entropy
 probP = numPlus / (numPlus + numMinus)
