@@ -1,0 +1,5 @@
+Spencer Barton
+10-601 Spring 2011
+HW 6 2/19/14
+
+I talked about the decision tree lecture and recitation with Justin Frye. We compared our notes from class and looked at the book on how the algoithm works.

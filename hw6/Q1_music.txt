@@ -1,0 +1,5 @@
+Spencer Barton
+10-601 Spring 2011
+HW 6 2/19/14
+
+The music dataset is probably not going to work as well since there are rarely single deciding factors in song popularity. In fact the music hit problem may be very tough since generating hits in the real world seems to be mostly luck. The given data has very littl classical music so it is likely that that is a sign of not being a hit.

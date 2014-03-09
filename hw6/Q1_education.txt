@@ -1,0 +1,5 @@
+Spencer Barton
+10-601 Spring 2011
+HW 6 2/19/14
+
+For the education dataset there is likely a correlation between something like final grade and the grade on the class final exam. A cursory look through the data supports a relationship between final grade and final exam grade. The quizes also seem to have more weight
