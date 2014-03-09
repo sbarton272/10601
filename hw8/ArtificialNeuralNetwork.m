@@ -1,45 +1,47 @@
-classdef BankAccount < handle
-   properties (Hidden)
-      AccountStatus = 'open';
-   end
+classdef ArtificialNeuralNetwork
+    % ArtificialNeuralNetwork
+    % Articicial Neural Network with one hidden layer
+    % Uses the sigmoid function as the node threshold function
    
-   properties (SetAccess = private)
-      AccountNumber
-      AccountBalance = 0;
-   end
-   
-   events
-      InsufficientFunds
+    properties (SetAccess = private)
+      % training algorithm
+      TrainingAlg;
+        
+      % size parameters
+      nHiddenLayers = 1;
+      nHiddenNodes;
+      nInputs;
+      nOutputs;
+      
+      % layers of Nodes
+      hiddenLayers;
+      outputLayer;
+      
+      % Various network functions
+      nodeThreshFunct = sigmoid;
+      outputThreshFunct;
+      
    end
    
    methods
-      function BA = BankAccount(AccountNumber,InitialBalance)
-         if nargin < 2
-            error('BankAccount:InvalidInitialization',...
-               'Must provide an account number and initial balance')
-         end
-         BA.AccountNumber  = AccountNumber;
-         BA.AccountBalance = InitialBalance;
-         AccountManager.addAccount(BA);
-      end % BankAccount
+      function obj = ArtificialNeuralNetwork(nHiddenLayers, nInputs)
+          % initialize ANN with the number
+          if nargin < 2)
+          end
+      end % ArtificialNeuralNetwork
       
-      function deposit(BA,amt)
-         BA.AccountBalance = BA.AccountBalance + amt;
-         if BA.AccountBalance > 0
-            BA.AccountStatus = 'open';
-         end
-      end % deposit
+      function getOutput(input)
+          
+      end % getOutput
       
-      function withdraw(BA,amt)
-         if (strcmp(BA.AccountStatus,'closed')&& BA.AccountBalance < 0)
-            disp(['Account ',num2str(BA.AccountNumber),' has been closed.'])
-            return
-         end
-         newbal = BA.AccountBalance - amt;
-         BA.AccountBalance = newbal;
-         if newbal < 0
-            notify(BA,'InsufficientFunds')
-         end
-      end % withdraw
+      function train()
+          obj.TrainingAlg.train();
+      end % train
+      
+      function y = sigmoid(x)
+        % sigmoid function with basic unit parameters
+        y = 1 / ( 1 + exp(-x) );
+      end % sigmoid
+      
    end % methods
 end % classdef
