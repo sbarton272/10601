@@ -3,15 +3,15 @@ classdef ArtificialNeuralNetwork
     % Articicial Neural Network with one hidden layer
     % Uses the sigmoid function as the node threshold function
    
-    properties (SetAccess = private)
+    properties
       % training algorithm
-      TrainingAlg;
+      TrainingAlg = BackPropegation; % TODO implement
         
       % size parameters
       nHiddenLayers = 1;
-      nHiddenNodes;
-      nInputs;
-      nOutputs;
+      nHiddenNodes = 1;
+      nInputs = 1;
+      nOutputs = 1;
       
       % layers of Nodes
       hiddenLayers;
@@ -19,18 +19,47 @@ classdef ArtificialNeuralNetwork
       
       % Various network functions
       nodeThreshFunct = sigmoid;
-      outputThreshFunct;
+      outputThreshFunct = @(x) x; %identity function
       
    end
    
    methods
-      function obj = ArtificialNeuralNetwork(nHiddenLayers, nInputs)
-          % initialize ANN with the number
-          if nargin < 2)
+      function obj = ArtificialNeuralNetwork(TrainingAlg, nHiddenLayers, ...
+                        nHiddenNodes, nInputs, nOutputs, ...
+                        nodeThreshFunct, outputThreshFunct)
+          % initialize ANN
+          if (nargin > 0)
+              obj.TrainingAlg = TrainingAlg;
+              obj.nHiddenLayers = nHiddenLayers;
+              obj.nHiddenNodes = nHiddenNodes;
+              obj.nInputs = nInputs;
+              obj.nOutputs = nOutputs;
+              obj.nodeThreshFunct = nodeThreshFunct;
+              obj.outputThreshFunct = outputThreshFunct;
           end
+          
+          % init layers vectors
+          % init backwards important for pre allocation
+          for n = obj.nOutputs:-1:1
+            obj.outputLayer(1,n) = ANNNode(obj.nHiddenNodes, ...
+                                           obj.nodeThreshFunct);
+          end
+          
+          % hidden layers
+          % TODO finish this
+          for n = obj.nHiddenNodes:-1:1
+            obj.hiddenLayers(1,n) = ANNNode(obj.nHiddenNodes, ...
+                                           obj.nodeThreshFunct);
+          end
+          
       end % ArtificialNeuralNetwork
       
-      function getOutput(input)
+      function output = getOutput(input)
+          assert( isEqaul( size(inputs), [1, obj.nInputs] ), ...
+            ['ArtificialNeuralNetwork.getOutput:', ...
+            'Inputs must be vector of correct size']);
+          output = 1:obj.nOutputs; % prealloc
+          % TODO finish
           
       end % getOutput
       
