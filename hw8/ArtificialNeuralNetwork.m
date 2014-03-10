@@ -3,9 +3,10 @@ classdef ArtificialNeuralNetwork < handle
     % Articicial Neural Network with one hidden layer
     % Uses the sigmoid function as the node threshold function
     
-    properties
+    properties % TODO make all private
       % training algorithm
-      TrainingAlg = []% BackPropegation; % TODO implement
+      TrainingAlg;
+      learningRate = .1;
         
       % size parameters
       nLayers = 2; % includes output layer
@@ -28,12 +29,12 @@ classdef ArtificialNeuralNetwork < handle
    end
    
    methods
-      function obj = ArtificialNeuralNetwork(TrainingAlg, nHiddenLayers, ...
+      function obj = ArtificialNeuralNetwork(nHiddenLayers, ...
                         nHiddenNodes, nInputs, nOutputs, ...
                         nodeThreshFunct, outputThreshFunct)
           % initialize ANN
           if (nargin > 0)
-              obj.TrainingAlg = TrainingAlg;
+              obj.TrainingAlg = BackPropegation(obj, obj.learningRate);
               obj.nLayers = nHiddenLayers + 1; % one output layer guaranteed
               obj.nHiddenNodes = nHiddenNodes;
               obj.nInputs = nInputs;
@@ -78,10 +79,28 @@ classdef ArtificialNeuralNetwork < handle
           
       end % getOutput
       
-      function train(obj)
-          obj.TrainingAlg.train();
+      function train(obj, trainingData)
+          obj.TrainingAlg.train(trainingData);
           obj.bTrained = true;
       end % train
+      
+      %========================================================
+      % Getters and Setters
+      %========================================================
+      
+      % TODO tidy all code as above
+
+      function n = getNLayers(obj)
+         n = obj.nLayers; 
+      end
+      
+      function weights = getLayerWeights(obj, layerN)
+          weights = obj.layers(layerN).getWeights();
+      end % getLayerWeights
+      
+      function layer = getLayer(obj, layerN)
+          layer = obj.layers(layerN);
+      end
       
    end % methods
 end % classdef

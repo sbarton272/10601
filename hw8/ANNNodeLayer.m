@@ -33,6 +33,16 @@ classdef ANNNodeLayer < handle
             
         end % getLayerOutput
         
+        function weights = getWeights(obj)
+            for nodeN = obj.layerSize:-1:1
+                weights(nodeN,1) = obj.nodes(nodeN).weights;
+            end
+        end % getWeights
+        
+        function layerSize = getLayerSize(obj)
+            layerSize = obj.layerSize;
+        end    
+        
     end
     
 end

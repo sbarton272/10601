@@ -28,14 +28,26 @@ disp('ANNNodeLayer functional :)');
 
 
 %% Test basic Artificial Neural Network
-ANN = ArtificialNeuralNetwork([], 0, 1, 1, 5,identity, absval); % single layer, single node, single input
+ANN = ArtificialNeuralNetwork(0, 1, 1, 5,identity, absval); % single layer, single node, single input
 input = [1];
 output = ANN.getOutput(input);
 assert( all( output >= 0 ) && all( output <= .5 ) );
 
-ANN = ArtificialNeuralNetwork([], 1, 4, 4, 5,identity, absval);
+ANN = ArtificialNeuralNetwork(1, 4, 4, 5,identity, absval);
 input = ones(1,4);
 output = ANN.getOutput(input);
 assert( all( output >= 0 ) && all( output <= .5*2 ) );
 
 disp('ArtificialNeuralNetwork functional :)');
+
+%% Test training ANN with single node
+% Train for identity function
+
+trainingData = {1, 1; -1, -1};
+ANN = ArtificialNeuralNetwork(0, 1, 1, 1,identity, identity); % single layer, single node, single input
+out1 = ANN.getOutput(1)
+out_1 = ANN.getOutput(-1)
+ANN.train(trainingData)
+
+disp('ArtificialNeuralNetwork trains :)');
+

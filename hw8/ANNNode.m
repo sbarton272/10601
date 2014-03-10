@@ -29,7 +29,7 @@ classdef ANNNode < handle
             net = dot(inputs,obj.weights);
             o = obj.thresholdFunct(net);
         end % getOutput
-        
+                
         function updateWeights(obj, newWeights)
             assert( isequal( size(newWeights), size(obj.weights) ), ...
               'ANNNode.updateWeights: newWeights must be vector of correct size');
