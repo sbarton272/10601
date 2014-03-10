@@ -67,7 +67,7 @@ classdef ArtificialNeuralNetwork < handle
             'Inputs must be vector of correct size']);
                     
           % propogate input through the layers with each passing new input
-          % forward
+          % forward          
           for layerN = obj.nLayers:-1:1
               input = obj.layers(1,layerN).getLayerOutput(input);
               % TODO may be horribly inefficient

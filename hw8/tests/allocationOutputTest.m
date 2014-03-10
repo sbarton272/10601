@@ -35,7 +35,7 @@ assert( all( output >= 0 ) && all( output <= .5 ) );
 
 ANN = ArtificialNeuralNetwork([], 1, 4, 4, 5,identity, absval);
 input = ones(1,4);
-output = ANN.getOutput(input)
-assert( all( output >= 0 ) && all( output <= .5*4 ) );
+output = ANN.getOutput(input);
+assert( all( output >= 0 ) && all( output <= .5*2 ) );
 
 disp('ArtificialNeuralNetwork functional :)');
