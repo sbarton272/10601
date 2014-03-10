@@ -1,11 +1,11 @@
-classdef ArtificialNeuralNetwork
+classdef ArtificialNeuralNetwork < handle
     % ArtificialNeuralNetwork
     % Articicial Neural Network with one hidden layer
     % Uses the sigmoid function as the node threshold function
    
     properties
       % training algorithm
-      TrainingAlg = BackPropegation; % TODO implement
+      TrainingAlg = []% BackPropegation; % TODO implement
         
       % size parameters
       nLayers = 2; % includes output layer
@@ -19,7 +19,7 @@ classdef ArtificialNeuralNetwork
       layers;
       
       % Various network functions
-      nodeThreshFunct = sigmoid;
+      nodeThreshFunct = obj.sigmoid;
       outputThreshFunct = @(x) x; %identity function
       
       % flags
@@ -34,7 +34,7 @@ classdef ArtificialNeuralNetwork
           % initialize ANN
           if (nargin > 0)
               obj.TrainingAlg = TrainingAlg;
-              obj.nLayers = nHiddenLayers;
+              obj.nLayers = nHiddenLayers + 1; % one output layer guaranteed
               obj.nHiddenNodes = nHiddenNodes;
               obj.nInputs = nInputs;
               obj.nOutputs = nOutputs;

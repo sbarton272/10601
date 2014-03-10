@@ -1,4 +1,4 @@
-classdef ANNNodeLayer
+classdef ANNNodeLayer < handle
     % ANNNodeLayer Layer of nodes
     % Keeps track of layer size and calculates output
     
@@ -19,7 +19,7 @@ classdef ANNNodeLayer
             end
         end % ANNNodeLayer
         
-        function output = getLayerOutput(input)
+        function output = getLayerOutput(obj,input)
        
             % prealloc
             output = 1:obj.layerSize;

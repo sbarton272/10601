@@ -1,4 +1,4 @@
-classdef ANNNode
+classdef ANNNode < handle
     % ANNNODE Node in an Artificial Neural Network (ANN).
     % Each node has weights and a threshold function
     % The node can calculate its output based on given inputs of the
@@ -11,7 +11,7 @@ classdef ANNNode
     end
     
     methods
-        function obj = Node(nInputs, thresholdFunct)
+        function obj = ANNNode(nInputs, thresholdFunct)
             % constructor
             
             % TODO other ways to init wieght values
@@ -22,14 +22,14 @@ classdef ANNNode
         end % Node
         
         function o = getOutput(obj, inputs)
-            assert( isEqaul( size(inputs), [1, obj.nInputs] ), ...
+            assert( isequal( size(inputs), [1, obj.nInputs] ), ...
               'ANNNode.getOutput: Inputs must be vector of correct size');
             net = dot(inputs,obj.weights);
             o = obj.thresholdFunct(net);
         end % getOutput
         
         function updateWeights(obj, newWeights)
-            assert( isEqual( size(newWeights), size(obj.weights) ), ...
+            assert( isequal( size(newWeights), size(obj.weights) ), ...
               'ANNNode.updateWeights: newWeights must be vector of correct size');
             obj.weights = newWeights;
         end % updateWeights
