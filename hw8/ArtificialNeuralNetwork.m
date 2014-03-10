@@ -3,6 +3,10 @@ classdef ArtificialNeuralNetwork < handle
     % Articicial Neural Network with one hidden layer
     % Uses the sigmoid function as the node threshold function
    
+    properties (Constant = true)
+       sigmoid = @(x) (1/(1 - exp(-x)));
+    end
+    
     properties
       % training algorithm
       TrainingAlg = []% BackPropegation; % TODO implement
@@ -19,7 +23,7 @@ classdef ArtificialNeuralNetwork < handle
       layers;
       
       % Various network functions
-      nodeThreshFunct = obj.sigmoid;
+      nodeThreshFunct = sigmoid;
       outputThreshFunct = @(x) x; %identity function
       
       % flags
@@ -83,11 +87,6 @@ classdef ArtificialNeuralNetwork < handle
           obj.TrainingAlg.train();
           obj.bTrained = true;
       end % train
-      
-      function y = sigmoid(x)
-        % sigmoid function with basic unit parameters
-        y = 1 / ( 1 + exp(-x) );
-      end % sigmoid
       
    end % methods
 end % classdef

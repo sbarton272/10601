@@ -4,7 +4,7 @@ classdef ANNNodeLayer < handle
     
     properties
         layerSize;
-        nodes;
+        nodes = [];
     end
     
     methods
@@ -14,8 +14,10 @@ classdef ANNNodeLayer < handle
                 
                 % init backwards important for pre allocation
                 for n = obj.layerSize:-1:1
-                    obj.nodes(1,n) = ANNNode(nNodeInputs, nodeThreshFunct);
+                    nodes(1,n) = ANNNode(nNodeInputs, nodeThreshFunct);
                 end
+                obj.nodes = nodes; % better performance to assign later
+                
             end
         end % ANNNodeLayer
         

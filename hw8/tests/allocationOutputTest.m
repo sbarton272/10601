@@ -3,6 +3,7 @@
 clear;
 
 negFunct = @(x) -x;
+sigmoid = @(x) (1/(1 + exp(-x)));
 
 %% test basic node
 node = ANNNode(2, negFunct);
@@ -17,7 +18,11 @@ assert( isequal( output, 1 ) );
 disp('ANNNode functional :)');
 
 %% Test basic node layer
+nodeLayer = ANNNodeLayer(5, 4, sigmoid);
+sumWeights = sum(nodeLayer.getLayerOutput( ones(1,4) )); % all output [0,1] 
+assert( sumWeights <= 5 );
+disp('ANNNodeLayer functional :)');
 
 
 %% Test basic Artificial Neural Network
-ANN = ArtificialNeuralNetwork([], 0, 0, 1, 1,[], []);
+% ANN = ArtificialNeuralNetwork([], 0, 0, 1, 1,[], []);

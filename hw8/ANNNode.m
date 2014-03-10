@@ -13,12 +13,13 @@ classdef ANNNode < handle
     methods
         function obj = ANNNode(nInputs, thresholdFunct)
             % constructor
-            
-            % TODO other ways to init wieght values
-            obj.nInputs = nInputs;
-            obj.weights = rand(1,nInputs) - .5; % range [ -.5, .5]
-            
-            obj.thresholdFunct = thresholdFunct;
+            if (nargin > 0)
+                % TODO other ways to init wieght values
+                obj.nInputs = nInputs;
+                obj.weights = rand(1,nInputs) - .5; % range [ -.5, .5]
+
+                obj.thresholdFunct = thresholdFunct;
+            end
         end % Node
         
         function o = getOutput(obj, inputs)
