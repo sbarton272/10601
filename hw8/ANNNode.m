@@ -8,7 +8,7 @@ classdef ANNNode < handle
         nInputs;
         weights;
         thresholdFunct;
-        weightFunct = @(len) rand(1,len) - .5; % range [-.5, .5]
+        weightFunct = @(len) (rand(1,len) - .5)/10; % range [-.05, .05]
     end
     
     methods
