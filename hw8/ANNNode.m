@@ -8,6 +8,7 @@ classdef ANNNode < handle
         nInputs;
         weights;
         thresholdFunct;
+        weightFunct = @(len) rand(1,len) - .5; % range [-.5, .5]
     end
     
     methods
@@ -16,7 +17,7 @@ classdef ANNNode < handle
             if (nargin > 0)
                 % TODO other ways to init wieght values
                 obj.nInputs = nInputs;
-                obj.weights = rand(1,nInputs) - .5; % range [ -.5, .5]
+                obj.weights = obj.weightFunct(nInputs);
 
                 obj.thresholdFunct = thresholdFunct;
             end

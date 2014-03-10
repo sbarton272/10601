@@ -1,7 +1,10 @@
 %% Test the allocation and output features of the ANN
 
 clear;
+addpath('..');
 
+absval = @(x) abs(x);
+identity = @(x) x;
 negFunct = @(x) -x;
 sigmoid = @(x) (1/(1 + exp(-x)));
 
@@ -25,7 +28,14 @@ disp('ANNNodeLayer functional :)');
 
 
 %% Test basic Artificial Neural Network
-ANN = ArtificialNeuralNetwork([], 0, 1, 1, 1,[]); % single layer, single node, single input
+ANN = ArtificialNeuralNetwork([], 0, 1, 1, 5,identity, absval); % single layer, single node, single input
 input = [1];
-ANN.getOutput(input)
+output = ANN.getOutput(input);
+assert( all( output >= 0 ) && all( output <= .5 ) );
+
+ANN = ArtificialNeuralNetwork([], 1, 4, 4, 5,identity, absval);
+input = ones(1,4);
+output = ANN.getOutput(input)
+assert( all( output >= 0 ) && all( output <= .5*4 ) );
+
 disp('ArtificialNeuralNetwork functional :)');
