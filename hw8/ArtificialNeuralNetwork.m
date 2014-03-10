@@ -4,7 +4,7 @@ classdef ArtificialNeuralNetwork < handle
     % Uses the sigmoid function as the node threshold function
    
     properties (Constant = true)
-       sigmoid = @(x) (1/(1 - exp(-x)));
+       nodeThreshFunct = @(x) (1/(1 - exp(-x))); % basic sigmoid
     end
     
     properties
@@ -23,7 +23,6 @@ classdef ArtificialNeuralNetwork < handle
       layers;
       
       % Various network functions
-      nodeThreshFunct = sigmoid;
       outputThreshFunct = @(x) x; %identity function
       
       % flags
@@ -34,7 +33,7 @@ classdef ArtificialNeuralNetwork < handle
    methods
       function obj = ArtificialNeuralNetwork(TrainingAlg, nHiddenLayers, ...
                         nHiddenNodes, nInputs, nOutputs, ...
-                        nodeThreshFunct, outputThreshFunct)
+                        outputThreshFunct)
           % initialize ANN
           if (nargin > 0)
               obj.TrainingAlg = TrainingAlg;
@@ -42,38 +41,35 @@ classdef ArtificialNeuralNetwork < handle
               obj.nHiddenNodes = nHiddenNodes;
               obj.nInputs = nInputs;
               obj.nOutputs = nOutputs;
-              obj.nodeThreshFunct = nodeThreshFunct;
               obj.outputThreshFunct = outputThreshFunct;
-          end
-          
-          % output layer allocation
-          obj.layers = 1:obj.nLayers; % pre alloc
-          % output layer
-          obj.layers(1,1) = ANNNodeLayer(obj.nOutputs, obj.nHiddenNodes,...
-                                         obj.nodeThreshFunct);
-          % init bottom hidden layer
-          obj.layers(1,obj.nLayers) = ANNNodeLayer(obj.nHiddenNodes, ...
-                                                   obj.nInputs,...
-                                                   obj.nodeThreshFunct);          
-          % init internal hidden layers
-          for layerN = 2:(obj.nLayers-1)
-            obj.layers(1,layerN) = ANNNodeLayer(obj.nHiddenNodes, ...
-                                                obj.nHiddenNodes,...
-                                                obj.nodeThreshFunct);
-          end
-          
+
+              % init bottom hidden layer if there
+              layers(1,obj.nLayers) = ANNNodeLayer(obj.nHiddenNodes, ...
+                                                       obj.nInputs,...
+                                                       obj.nodeThreshFunct);          
+              % output layer
+              layers(1,1) = ANNNodeLayer(obj.nOutputs, obj.nHiddenNodes,...
+                                             obj.nodeThreshFunct);                                                  
+              % init internal hidden layers
+              for layerN = 2:(obj.nLayers-1)
+                layers(1,layerN) = ANNNodeLayer(obj.nHiddenNodes, ...
+                                                    obj.nHiddenNodes,...
+                                                    obj.nodeThreshFunct);
+              end
+              obj.layers = layers; % more efficient to assign later
+          end % for (nargin > 0)
       end % ArtificialNeuralNetwork
       
       function output = getOutput(obj, input)
           % getOutput Get the output vector of a trained ANN given an input
           % vector
-          assert( isEqaul( size(inputs), [1, obj.nInputs] ), ...
+          assert( isequal( size(input), [1, obj.nInputs] ), ...
             ['ArtificialNeuralNetwork.getOutput:', ...
             'Inputs must be vector of correct size']);
                     
           % propogate input through the layers with each passing new input
           % forward
-          for layerN = 1:obj.nHiddenLayers
+          for layerN = 1:obj.nLayers
               input = obj.layers(1,layerN).getLayerOutput(input);
               % TODO may be horribly inefficient
           end

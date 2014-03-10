@@ -25,4 +25,7 @@ disp('ANNNodeLayer functional :)');
 
 
 %% Test basic Artificial Neural Network
-% ANN = ArtificialNeuralNetwork([], 0, 0, 1, 1,[], []);
+ANN = ArtificialNeuralNetwork([], 0, 1, 1, 1,[]); % single layer, single node, single input
+input = [1];
+ANN.getOutput(input)
+disp('ArtificialNeuralNetwork functional :)');
