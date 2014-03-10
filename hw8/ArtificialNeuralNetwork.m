@@ -43,7 +43,6 @@ classdef ArtificialNeuralNetwork
           end
           
           % output layer allocation
-          % init backwards important for pre allocation
           obj.layers = 1:obj.nLayers; % pre alloc
           % output layer
           obj.layers(1,1) = ANNNodeLayer(obj.nOutputs, obj.nHiddenNodes,...
@@ -61,29 +60,26 @@ classdef ArtificialNeuralNetwork
           
       end % ArtificialNeuralNetwork
       
-      function output = getOutput(input)
+      function output = getOutput(obj, input)
           % getOutput Get the output vector of a trained ANN given an input
           % vector
           assert( isEqaul( size(inputs), [1, obj.nInputs] ), ...
             ['ArtificialNeuralNetwork.getOutput:', ...
             'Inputs must be vector of correct size']);
-          
-          output = 1:obj.nOutputs; % prealloc output
-          % propogate input through the layers
+                    
+          % propogate input through the layers with each passing new input
+          % forward
           for layerN = 1:obj.nHiddenLayers
-              
+              input = obj.layers(1,layerN).getLayerOutput(input);
+              % TODO may be horribly inefficient
           end
           
+          % output from final layer is the result
+          output = input;
           
       end % getOutput
       
-      function output = getLayerOutput(input, layerN)
-          % getLayerOutput Get the output of a given layer given the input
-          output = 1:obj.nInputs; % TODO generalize with layer object
-          nodes = hiddenLayers()
-      end % getLayerOutput
-      
-      function train()
+      function train(obj)
           obj.TrainingAlg.train();
           obj.bTrained = true;
       end % train

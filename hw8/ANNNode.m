@@ -21,14 +21,14 @@ classdef ANNNode
             obj.thresholdFunct = thresholdFunct;
         end % Node
         
-        function o = getOutput(inputs)
+        function o = getOutput(obj, inputs)
             assert( isEqaul( size(inputs), [1, obj.nInputs] ), ...
               'ANNNode.getOutput: Inputs must be vector of correct size');
             net = dot(inputs,obj.weights);
             o = obj.thresholdFunct(net);
         end % getOutput
         
-        function updateWeights(newWeights)
+        function updateWeights(obj, newWeights)
             assert( isEqual( size(newWeights), size(obj.weights) ), ...
               'ANNNode.updateWeights: newWeights must be vector of correct size');
             obj.weights = newWeights;
