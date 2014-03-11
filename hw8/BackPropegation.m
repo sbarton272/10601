@@ -4,9 +4,8 @@ classdef BackPropegation < handle
     
     properties
         ANN;
-        nIter = 0;
         maxIter = 10;
-        learningRate = .01;
+        learningRate = 1;
         nLayers;
         
         % intermediary storage elements
@@ -36,14 +35,16 @@ classdef BackPropegation < handle
             for iter = 1:obj.maxIter % termination
                 % iterate through a set number of times performing gradient
                 % decent
-                obj.nIter = iter; % TODO necessary?
+                fprintf('====== %d\n', iter)
                 
                 for exampleIndex = 1:obj.nTrainingElems
                     % iter through each example performing gradient decent
                     % on each eaxample
-                    trainingExample = obj.trainingData(exampleIndex);
-                    example = trainingExample(1);
-                    exampleTarget = trainingExample(2);
+                    trainingExample = obj.trainingData(exampleIndex,:);
+                    example = trainingExample( 1:obj.ANN.nInputs );
+                    exampleTarget = trainingExample( obj.ANN.nInputs+1:end );
+                    
+                    fprintf('> %d -> %d\n', example, exampleTarget)
                     
                     % destructively update ANN
                     obj.calculateNodeOutputs(example);
@@ -57,12 +58,14 @@ classdef BackPropegation < handle
         function calculateNodeOutputs(obj, input)
             % propegate the training example input and store the
             % intermediary results in nodeOutputs
-            
-            obj.nodeOutputs(obj.ANN.getNLayers()+1) = input;
+
+            obj.nodeOutputs{obj.ANN.getNLayers()+1} = input;
             for layerN = obj.nLayers:-1:1
                 input = obj.ANN.layers(1,layerN).getLayerOutput(input);
-                obj.nodeOutputs(layerN) = input;
+                obj.nodeOutputs{layerN} = input;
             end
+            
+            fprintf('output: \t%f\n', input)
                         
         end % calculateNodeOutputs
         
@@ -71,8 +74,10 @@ classdef BackPropegation < handle
             % already been calculated
             
             % calculate output layer error first
-            networkOutput = obj.nodeOutputs(1);
-            obj.nodeErrors(1) = networkOutput.*(1-networkOutput).*(outputTarget-networkOutput);
+            networkOutput = obj.nodeOutputs{1};
+            obj.nodeErrors{1} = networkOutput.*(1-networkOutput).*(outputTarget-networkOutput);
+            
+            fprintf('error:  \tnetwork: %f, target: %d\n', networkOutput, outputTarget)
             
             % calculate hidden layer errors
             for layerN = 2:obj.nLayers
@@ -81,14 +86,14 @@ classdef BackPropegation < handle
                 
                 % dot product of weights and nextError per node
                 weights = obj.ANN.getLayerWeights(layerN-1); % matrix nOutputs x nNodes
-                nextError = obj.nodeErrors(layerN-1)';
-                nextNodeError = repmat(nextError, 1, obj.ANN.getLayerSize()); % nOutputs x nOutputs
+                nextError = obj.nodeErrors{layerN-1}'; % nOutputs x 1
+                nextNodeError = repmat(nextError, 1, length(nextError)); % nOutputs x nOutputs
                 weightedErr = dot(weights, nextNodeError,1);
                 
-                layerOutput = obj.nodeOutputs(1); % 1 x nOutputs
+                layerOutput = obj.nodeOutputs{layerN}; % 1 x nOutputs
                 % nodeErrors is 1 x nNodes
-                dot(weights, nextError,2)
-                obj.nodeErrors(layerN) = layerOutput.*(1-layerOutput).*weightedErr;
+                dot(weights, nextError,2);
+                obj.nodeErrors{layerN} = layerOutput.*(1-layerOutput).*weightedErr;
             end
             
         end % calculateNodeErrors
@@ -102,11 +107,15 @@ classdef BackPropegation < handle
                 
                 for nodeN = 1:layer.getLayerSize()
                     weights = layer.nodes(nodeN).weights;
-                    layerErr = obj.nodeErrors(layerN);
+                    layerErr = obj.nodeErrors{layerN};
                     err = layerErr(nodeN);
-                    inputs = obj.nodeOutputs(layerN - 1); % output from layer below
+                    inputs = obj.nodeOutputs{layerN + 1}; % output from layer below
                     % update weights
                     layer.nodes(nodeN).weights = weights + obj.learningRate*err*inputs;
+
+                    delta = obj.learningRate*err*inputs;
+                    fprintf('weights:\t%f + %f = %f\n', weights, delta, layer.nodes(nodeN).weights) 
+                    fprintf('err:    \t%f\n', err)
                 end
             end 
             

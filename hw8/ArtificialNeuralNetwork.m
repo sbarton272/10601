@@ -34,7 +34,6 @@ classdef ArtificialNeuralNetwork < handle
                         nodeThreshFunct, outputThreshFunct)
           % initialize ANN
           if (nargin > 0)
-              obj.TrainingAlg = BackPropegation(obj, obj.learningRate);
               obj.nLayers = nHiddenLayers + 1; % one output layer guaranteed
               obj.nHiddenNodes = nHiddenNodes;
               obj.nInputs = nInputs;
@@ -57,6 +56,9 @@ classdef ArtificialNeuralNetwork < handle
                                                     obj.nodeThreshFunct);
               end
               obj.layers = ANNlayers; % more efficient to assign later
+              
+              obj.TrainingAlg = BackPropegation(obj, obj.learningRate);
+
           end % for (nargin > 0)
       end % ArtificialNeuralNetwork
       
@@ -80,6 +82,7 @@ classdef ArtificialNeuralNetwork < handle
       end % getOutput
       
       function train(obj, trainingData)
+          assert( size(trainingData,2) == (obj.nInputs+obj.nOutputs) );
           obj.TrainingAlg.train(trainingData);
           obj.bTrained = true;
       end % train
@@ -91,7 +94,7 @@ classdef ArtificialNeuralNetwork < handle
       % TODO tidy all code as above
 
       function n = getNLayers(obj)
-         n = obj.nLayers; 
+         n = obj.nLayers;
       end
       
       function weights = getLayerWeights(obj, layerN)
