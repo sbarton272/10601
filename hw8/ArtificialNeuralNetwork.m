@@ -3,6 +3,10 @@ classdef ArtificialNeuralNetwork < handle
     % Articicial Neural Network with one hidden layer
     % Uses the sigmoid function as the node threshold function
     
+    properties (Constant = true)
+      nodeThreshFunct = @(x) (1/(1 + exp(-x))); % basic sigmoid 
+    end
+    
     properties % TODO make all private
       % training algorithm
       TrainingAlg;
@@ -21,7 +25,6 @@ classdef ArtificialNeuralNetwork < handle
       
       % Various network functions
       outputThreshFunct = @(x) x; %identity function
-      nodeThreshFunct = @(x) (1/(1 + exp(-x))); % basic sigmoid
       
       % flags
       bTrained = false;
@@ -31,14 +34,13 @@ classdef ArtificialNeuralNetwork < handle
    methods
       function obj = ArtificialNeuralNetwork(nHiddenLayers, ...
                         nHiddenNodes, nInputs, nOutputs, ...
-                        nodeThreshFunct, outputThreshFunct)
+                        outputThreshFunct)
           % initialize ANN
           if (nargin > 0)
               obj.nLayers = nHiddenLayers + 1; % one output layer guaranteed
               obj.nHiddenNodes = nHiddenNodes;
               obj.nInputs = nInputs;
               obj.nOutputs = nOutputs;
-              obj.nodeThreshFunct = nodeThreshFunct;
               obj.outputThreshFunct = outputThreshFunct;
 
               % init bottom hidden layer if there

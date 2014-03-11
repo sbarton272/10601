@@ -35,7 +35,7 @@ classdef ANNNodeLayer < handle
         
         function weights = getWeights(obj)
             for nodeN = obj.layerSize:-1:1
-                weights(nodeN,1) = obj.nodes(nodeN).weights;
+                weights(nodeN,:) = obj.nodes(nodeN).weights;
             end
         end % getWeights
         
