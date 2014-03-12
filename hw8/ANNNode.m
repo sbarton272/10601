@@ -17,7 +17,8 @@ classdef ANNNode < handle
             if (nargin > 0)
                 % TODO other ways to init wieght values
                 obj.nInputs = nInputs;
-                obj.weights = obj.weightFunct(nInputs);
+                % extra weight is offset weight
+                obj.weights = obj.weightFunct(nInputs+1);
 
                 obj.thresholdFunct = thresholdFunct;
             end
@@ -26,16 +27,25 @@ classdef ANNNode < handle
         function o = getOutput(obj, inputs)
             assert( isequal( size(inputs), [1, obj.nInputs] ), ...
               'ANNNode.getOutput: Inputs must be vector of correct size');
-            net = dot(inputs,obj.weights);
+          % pad with a 1 for the offset weight
+          inputs = [1, inputs];
+          net = dot(inputs,obj.weights);
             o = obj.thresholdFunct(net);
         end % getOutput
                 
+        function setWeights(obj, newWeights)
+            assert( isequal( size(newWeights), size(obj.weights) ), ...
+                'ANNNode.updateWeights: newWeights must be vector of correct size');
+            % weights includes offset weight
+           obj.weights = newWeights;
+        end
+        
         function updateWeights(obj, newWeights)
             assert( isequal( size(newWeights), size(obj.weights) ), ...
               'ANNNode.updateWeights: newWeights must be vector of correct size');
-            obj.weights = newWeights;
+            obj.weights = obj.weights + newWeights;
         end % updateWeights
-        
+                
     end % methods
     
 end % class

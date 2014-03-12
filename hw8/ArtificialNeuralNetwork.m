@@ -33,24 +33,21 @@ classdef ArtificialNeuralNetwork < handle
    
    methods
       function obj = ArtificialNeuralNetwork(nHiddenLayers, ...
-                        nHiddenNodes, nInputs, nOutputs, ...
-                        outputThreshFunct)
+                        nHiddenNodes, nInputs, nOutputs)
           % initialize ANN
           if (nargin > 0)
               obj.nLayers = nHiddenLayers + 1; % one output layer guaranteed
               obj.nHiddenNodes = nHiddenNodes;
               obj.nInputs = nInputs;
               obj.nOutputs = nOutputs;
-              obj.outputThreshFunct = outputThreshFunct;
 
               % init bottom hidden layer if there
               ANNlayers(1,obj.nLayers) = ANNNodeLayer(obj.nHiddenNodes, ...
                                                        obj.nInputs,...
                                                        obj.nodeThreshFunct);          
               % init output layer
-              % note that it has a different outputThreshFunct
               ANNlayers(1,1) = ANNNodeLayer(obj.nOutputs, obj.nHiddenNodes,...
-                                             obj.outputThreshFunct);                                                  
+                                             obj.nodeThreshFunct);                                                  
               % init internal hidden layers
               for layerN = 2:(obj.nLayers-1)
                 ANNlayers(1,layerN) = ANNNodeLayer(obj.nHiddenNodes, ...
