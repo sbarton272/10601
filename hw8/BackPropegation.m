@@ -16,11 +16,12 @@ classdef BackPropegation < handle
     end
     
     methods
-        function obj = BackPropegation(ANN, learningRate)
+        function obj = BackPropegation(ANN, learningRate, maxIterations)
             if (nargin > 0)
                 obj.ANN = ANN;
                 obj.nLayers = obj.ANN.getNLayers();
                 obj.learningRate = learningRate;
+                obj.maxIter = maxIterations;
                 
                 % init intermediary storage elements, row vects
                 obj.nodeOutputs = cell(1, obj.nLayers + 1); % +1 to store input to network as well

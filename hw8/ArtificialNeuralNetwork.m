@@ -11,6 +11,7 @@ classdef ArtificialNeuralNetwork < handle
       % training algorithm
       TrainingAlg;
       learningRate = .1;
+      maxIter = 5000;
         
       % size parameters
       nLayers = 2; % includes output layer
@@ -33,13 +34,16 @@ classdef ArtificialNeuralNetwork < handle
    
    methods
       function obj = ArtificialNeuralNetwork(nHiddenLayers, ...
-                        nHiddenNodes, nInputs, nOutputs)
+                        nHiddenNodes, nInputs, nOutputs, learningRate, ...
+                        maxIterations)
           % initialize ANN
           if (nargin > 0)
               obj.nLayers = nHiddenLayers + 1; % one output layer guaranteed
               obj.nHiddenNodes = nHiddenNodes;
               obj.nInputs = nInputs;
               obj.nOutputs = nOutputs;
+              obj.learningRate = learningRate;
+              obj.maxIter = maxIterations;
 
               % init bottom hidden layer if there
               ANNlayers(1,obj.nLayers) = ANNNodeLayer(obj.nHiddenNodes, ...
@@ -56,7 +60,7 @@ classdef ArtificialNeuralNetwork < handle
               end
               obj.layers = ANNlayers; % more efficient to assign later
               
-              obj.TrainingAlg = BackPropegation(obj, obj.learningRate);
+              obj.TrainingAlg = BackPropegation(obj, obj.learningRate, obj.maxIter);
 
           end % for (nargin > 0)
       end % ArtificialNeuralNetwork
