@@ -111,5 +111,20 @@ classdef ArtificialNeuralNetwork < handle
           layer = obj.layers(layerN);
       end
       
+      function weights = getAllWeights(obj)
+          for layerN = obj.nLayers:-1:1
+            weights{layerN} = obj.getLayerWeights(layerN);
+          end
+      end
+      
+      function setAllWeights(obj, weights)
+         % takes in a cell array with node weights ordered by layer with 1 
+         % being the top (output) layer. The node weights are row vecters
+         % of weights ordered by node
+         for layerN = obj.nLayers:-1:1
+             obj.layers(layerN).setWeights(weights{layerN});
+         end
+      end
+      
    end % methods
 end % classdef

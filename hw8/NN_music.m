@@ -2,9 +2,6 @@
 % 10601
 % NN_music.m
 
-%% TODO: training error MUST ALWAYS decrease
-% Pick starting weights accordingly
-
 function NN_music(trainingFileName, testFileName)
 
 %% load files 
@@ -50,19 +47,28 @@ end
 % Print squared error every 10 iterations
 ANN = ArtificialNeuralNetwork(1,4,4,1,1,10);
 
+% set weights based on prior iteration
+load('musicWeights.mat', 'weights');
+ANN.setAllWeights(weights);
+
+
 target = trainingData(:,5);
 inputs = trainingData(:,1:4);
 for iterN = 30:-1:1
     % display error for all inputs
     outputs = ANN.getOutput(inputs);
     errs(iterN) = sqrErr(outputs, target);
-    fprintf( '%f\n', errs(iterN) );
+    fprintf( '%.2f\n', errs(iterN) );
     % train for 10 iterations
     ANN.train(trainingData);
 end
 
+% save weights if they are good
+% weights = ANN.getAllWeights();
+% save('musicWeights.mat', 'weights');
+
 fprintf('TRAINING COMPLETED! NOW PREDICTING.\n');
-plot(30:-1:1,errs)
+% plot(30:-1:1,errs)
 
 %% predict the test data
 prediction = ANN.getOutput(testingData);
