@@ -1,0 +1,7 @@
+Spencer Barton
+10-601
+HW 8
+
+I did recieve and give help with this assignment. I collaborated with Justin Frye, Sean Klien and Erik Pintar
+
+We discussed the algorithm and the assignment criteria. Specifically we discussed whether to place a perceptron on the output layer or another function (this was clarified on piazza). We also discussed how to scale the input data (again answered on piazza). We also compared error rates (though in hind sight that was pointless as we all had different scaling criteria for the input data).
