@@ -44,11 +44,11 @@ for iterN = 30:-1:1
 end
 
 % save weights if they are good
-weights = ANN.getAllWeights();
-save('educationWeights.mat', 'weights');
+% weights = ANN.getAllWeights();
+% save('educationWeights.mat', 'weights');
 
 fprintf('TRAINING COMPLETED! NOW PREDICTING.\n');
-plot(30:-1:1,errs)
+% plot(30:-1:1,errs)
 
 %% predict the test data
 prediction = ANN.getOutput(testingData);

@@ -58,7 +58,7 @@ for iterN = 30:-1:1
     % display error for all inputs
     outputs = ANN.getOutput(inputs);
     errs(iterN) = sqrErr(outputs, target);
-    fprintf( '%.2f\n', errs(iterN) );
+    fprintf( '%f\n', errs(iterN) );
     % train for 10 iterations
     ANN.train(trainingData);
 end
