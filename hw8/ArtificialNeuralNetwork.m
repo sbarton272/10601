@@ -65,22 +65,25 @@ classdef ArtificialNeuralNetwork < handle
           end % for (nargin > 0)
       end % ArtificialNeuralNetwork
       
-      function output = getOutput(obj, input)
+      function outputs = getOutput(obj, inputs)
           % getOutput Get the output vector of a trained ANN given an input
           % vector
-          assert( isequal( size(input), [1, obj.nInputs] ), ...
+          assert( size(inputs,2) == obj.nInputs, ...
             ['ArtificialNeuralNetwork.getOutput:', ...
             'Inputs must be vector of correct size']);
-                    
-          % propogate input through the layers with each passing new input
-          % forward          
-          for layerN = obj.nLayers:-1:1
-              input = obj.layers(1,layerN).getLayerOutput(input);
-              % TODO may be horribly inefficient
+           
+          for inputN = size(inputs,1):-1:1
+              % propogate input through the layers with each passing new input
+              % forward  
+              input = inputs(inputN,:);
+              for layerN = obj.nLayers:-1:1
+                  input = obj.layers(1,layerN).getLayerOutput(input);
+                  % TODO may be horribly inefficient
+              end
+
+              % output from final layer is the result
+              outputs(inputN,:) = input;
           end
-          
-          % output from final layer is the result
-          output = input;
           
       end % getOutput
       

@@ -30,12 +30,12 @@ disp('ANNNodeLayer functional :)');
 
 
 %% Test basic Artificial Neural Network
-ANN = ArtificialNeuralNetwork(0, 1, 1, 1); % single layer, single node, single input
+ANN = ArtificialNeuralNetwork(0, 1, 1, 1, 1, 1); % single layer, single node, single input
 input = 1;
 output = ANN.getOutput(input);
 assert( output >= 0 && output <= 1 );
 
-ANN = ArtificialNeuralNetwork(1, 4, 4, 5);
+ANN = ArtificialNeuralNetwork(1, 4, 4, 5, 1, 1);
 input = ones(1,4);
 output = ANN.getOutput(input);
 assert( all( output >= 0 ) && all( output <= 1 ) );
@@ -48,7 +48,7 @@ disp('ArtificialNeuralNetwork functional :)');
 x = -1:.1:1;
 y = 1 ./ (1 + exp(-x));
 td = [x',y'];
-ANN = ArtificialNeuralNetwork(0, 1, 1, 1); % single layer, single node, single input
+ANN = ArtificialNeuralNetwork(0, 1, 1, 1, 1, 1); % single layer, single node, single input
 fprintf('%f != %f\n', ANN.getOutput(1), sigmoid(1));
 fprintf('%f != %f\n', ANN.getOutput(-1), sigmoid(-1));
 ANN.train(td);
@@ -61,7 +61,7 @@ x = [ 0 1;
       1 0];
 y = x;
 td = [x,y];
-ANN = ArtificialNeuralNetwork(1, 1, 2, 2); % single layer, single node, single input
+ANN = ArtificialNeuralNetwork(1, 1, 2, 2, 1, 1); % single layer, single node, single input
 % set weights for easier debugging
 ANN.layers(1).nodes(1).setWeights([-.5 1]);
 ANN.layers(1).nodes(2).setWeights([.5 -1]);
@@ -97,7 +97,7 @@ x = [ 0 0 0 0 0 0 0 1;
       1 0 0 0 0 0 0 0];
 y = x;
 td = [x,y];
-ANN = ArtificialNeuralNetwork(1, 3, 8, 8); % single layer, single node, single input
+ANN = ArtificialNeuralNetwork(1, 3, 8, 8, 1, 1); % single layer, single node, single input
 
 for i = 1:10000
     ANN.train(td);
