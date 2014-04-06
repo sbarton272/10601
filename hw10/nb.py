@@ -9,45 +9,52 @@ TRAIN_FILE_NAME = sys.argv[2]
 
 class NaiveBayesClassifier(object):
 	"""NaiveBayesClassifier"""
-	def __init__(self, trainFile, testFile, categories):
+	def __init__(self, trainFile, testFile, docCategories):
 		self.trainFile = trainFile
 		self.testFile  = testFile
 
-		self.categories = categories
-		self.categoryProb = dict.fromkeys(self.categories,0)
+		self.docCategories = docCategories
+		self.categoryProb = dict.fromkeys(self.docCategories,0)
 
 		# 1) Gather vocabulary found in training files
-		self.vocabulary = self.getVocab(self.trainFile)
-		self.vocabSize = len(self.vocab)
+		# 2) Determine document category probability
+		self.parseDocs(self.trainFile)
 
-		# 2) Determine word prob.
-		#self.wordProb
-
-	def getVocab(self, trainFile):
+	def parseDocs(self, trainFile):
 		"""get all unique words in training file
 			also records counts of doc categories"""
-		vocabulary = set(); # stores unique words
+		self.wordProb = dict(); # stores unique word prob
+		wordCountsByCategory = dict.fromkeys(self.docCategories,0) # count words by category
 
 		with open(trainFile) as trainFID:
 			for docName in trainFID:
 				# read in file names of blog documents
-				docType = re.match('([a-z]+)', docName).group(0)
+				docCategory = re.match('([a-z]+)', docName).group(0)
 				
 				# store doc count in categoryProb var
-				self.categoryProb[docType] += 1 # if key error will want to see it
+				self.categoryProb[docCategory] += 1 # if key error will want to see it
 
 				with open(docName) as docFID:
 					# add each document's words to the vocabulary
 					
-					for
-						# set 
-						vocabulary.add(word)
+					for word in docFID:
+						# count unique words by doc type
+						self.updateWordProb(word) 
+						wordCountsByCategory[docCategory] += 1
 
 		# normalize categoryProb to prob instead of count
 		total = float(sum(self.categoryProb.values()))
 		# dict comprehension used for efficiency, simply dividing each value by total
 		self.categoryProb = {k: v/total for k, v in self.categoryProb.iteritems()}
 
-		return vocabulary
+		# normalize prob
+		vocabLen = len(self.wordProb)
+
+	def updateWordProb(self, word):
+		"""Init/update word count. Data structure is of form {word: {cat1: count1, cat2: count2}}"""
+
+		if word not in self.wordProb:
+			self.wordProb[word] = dict.fromkeys(self.docCategories,0) 
+		wordProb[word][docCategory] += 1 
 
 
