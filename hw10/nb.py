@@ -9,9 +9,10 @@ TRAIN_FILE_NAME = sys.argv[2]
 
 class NaiveBayesClassifier(object):
 	"""NaiveBayesClassifier"""
-	def __init__(self, trainFile, testFile, docCategories):
+	def __init__(self, trainFile, testFile, docCategories, smoothingConst = 1):
 		self.trainFile = trainFile
 		self.testFile  = testFile
+		self.smoothingConst = smoothingConst
 
 		self.docCategories = docCategories
 		self.categoryProb = dict.fromkeys(self.docCategories,0)
@@ -49,6 +50,11 @@ class NaiveBayesClassifier(object):
 
 		# normalize prob
 		vocabLen = len(self.wordProb)
+		nWordsByCat = wordCountsByCategory[docCategory]
+		q = self.smoothingConst
+		# dict comprehension used for efficiency
+		# updating each count to be a prob: (count + q) / (nWordsByCat + vocabLength)
+		self.categoryProb = {k: (v + q) / (nWordsByCat + q*vocabLen) for k, v in self.categoryProb.iteritems()}
 
 	def updateWordProb(self, word):
 		"""Init/update word count. Data structure is of form {word: {cat1: count1, cat2: count2}}"""
