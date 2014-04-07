@@ -3,9 +3,7 @@
 # Naive Bayes Classifier
 
 import re
-
-#TEST_FILE_NAME = sys.argv[1] 
-#TRAIN_FILE_NAME = sys.argv[2] 
+from math import log as ln
 
 class NaiveBayesClassifier(object):
 	"""NaiveBayesClassifier"""
@@ -19,21 +17,27 @@ class NaiveBayesClassifier(object):
 
 		self.wordProb = dict(); # stores unique word prob
 
-		# 1) Gather vocabulary found in training files
-		# 2) Determine document category probability
-		self.parseDocs(self.trainFile)
+		self.train(self.trainFile)
+		self.test(self.testFile)
 
-	def parseDocs(self, trainFile):
-		"""get all unique words in training file
-			also records counts of doc categories"""
+
+	#===============================================
+	# Train
+	#===============================================
+
+	def train(self, trainFile):
+		"""For each doc in the training file:
+			1) count word occurance
+			2) record unique words
+			3) update category prob
+			4) update word prob conditioned on category """
 		wordCountsByCat = dict.fromkeys(self.docCategories,0) # count words by category
 
 		with open(trainFile) as trainFID:
 			for docName in trainFID:
 
 				# read in file names of blog documents
-				#docCategory = re.match('([a-z]+)', docName).group(0)
-				docCategory = re.match('testData/([a-z]+)', docName).group(1)
+				docCategory = re.match('([a-z]+)', docName).group(0)
 
 				# store doc count in categoryProb var
 				self.categoryProb[docCategory] += 1 # if key error will want to see it
@@ -62,9 +66,9 @@ class NaiveBayesClassifier(object):
 
 		# updating each count to be a prob: (count + q) / (nWordsByCat + vocabLength)
 		for (word,counts) in self.wordProb.iteritems():
-			for (cat, n) in counts.iteritems():
-				nk = wordCountsByCat[cat]
-				self.wordProb[word][cat] = (n + q) / float(nk + q*vocabLen)
+			for (cat, nk) in counts.iteritems():
+				n = wordCountsByCat[cat]
+				self.wordProb[word][cat] = (nk + q) / float(n + q*vocabLen)
 
 	def updateWordProb(self, word, docCategory):
 		"""Init/update word count. Data structure is of form {word: {cat1: count1, cat2: count2}}"""
@@ -74,9 +78,73 @@ class NaiveBayesClassifier(object):
 		self.wordProb[word][docCategory] += 1 
 
 	def preprocessWord(self, word):
-		return word.strip().lower()
+		return word.lower()
 
-NB_TEST = NaiveBayesClassifier('testData/test.txt', '', ['lib', 'con'])
-print NB_TEST.categoryProb
-for (k,v) in NB_TEST.wordProb.iteritems():
-	print k, v
+	#===============================================
+	# Test
+	#===============================================
+
+	def test(self, testFile):
+		""" label docs in test file """
+
+		# for reporting correctness 
+		nCorrect = 0.0
+		nTotal = 0.0
+
+		with open(testFile) as testFID:
+			for docName in testFID:
+				# classify all docs
+
+				# read in file names of blog documents
+				docCategory = re.match('([a-z]+)', docName).group(0)
+				classification = self.classify(docName)
+
+				if classification == docCategory:
+					nCorrect += 1
+				nTotal += 1
+
+				self.printClassification(classification)
+		
+		print 'Accuracy:', round(nCorrect / nTotal,4)
+
+	def classify(self, docName):
+		""" classify the given document. Utilize the naive bayes assumption with log probability."""		
+		maxProb = float('-inf') # lowest number for comparison purposes
+		maxLabel = ''
+
+		for cat in self.docCategories:
+			# calculate probabilities of various classifications
+			prob = ln(self.categoryProb[cat])
+
+			with open(docName.strip()) as docFID:
+				# add each document's words to the vocabulary
+				
+				for word in docFID:
+					if word in self.wordProb:
+						# ignore words not in vocabulary
+						prob += ln(self.wordProb[word][cat])
+
+			# update max prob and label
+			if maxProb < prob:
+				maxProb = prob
+				maxLabel = cat
+
+		return maxLabel
+
+	def printClassification(self, classification):
+		print classification[0].upper()
+
+
+#===============================================
+# Script
+#===============================================
+
+# NB_TEST = NaiveBayesClassifier('train.txt', 'test.txt', ['foo', 'bar'])
+# print NB_TEST.categoryProb
+# for (k,v) in NB_TEST.wordProb.iteritems():
+# 	print k, v
+
+TRAIN_FILE_NAME = 'split.train'  #sys.argv[1]
+TEST_FILE_NAME  = 'split.test'  #sys.argv[2]
+
+NB = NaiveBayesClassifier(TRAIN_FILE_NAME, TEST_FILE_NAME, ['lib', 'con'])
