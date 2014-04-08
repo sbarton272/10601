@@ -3,13 +3,14 @@
 # Naive Bayes Classifier
 
 from NaiveBayesClassifier import NaiveBayesClassifier
+import sys
 
 #===============================================
 # Script
 #===============================================
 
-TRAIN_FILE_NAME = 'split.train'  #sys.argv[1]
-TEST_FILE_NAME  = 'split.test'  #sys.argv[2]
+TRAIN_FILE_NAME = sys.argv[1]
+TEST_FILE_NAME  = sys.argv[2]
 
 NB = NaiveBayesClassifier()
 NB.train(TRAIN_FILE_NAME)
