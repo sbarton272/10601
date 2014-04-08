@@ -10,27 +10,27 @@ class NaiveBayesClassifier(object):
 	"""NaiveBayesClassifier"""
 	def __init__(self, docCategories = ['lib', 'con'], nStopWords = 0, smoothingConst = 1):
 		self.smoothingConst = smoothingConst
-
 		self.docCategories = docCategories
-		self.categoryProb = dict.fromkeys(self.docCategories,0)
-
-		self.wordCount = dict(); # stores unique word prob
-
 		self.nStopWords = nStopWords
-		self.stopWordsCount = dict.fromkeys(self.docCategories, 0)
-		self.stopWords = set([])
 
 	#===============================================
 	# Train
 	#===============================================
 
 	def train(self, trainFile):
-		"""For each doc in the training file:
-			1) count word occurance
-			2) record unique words
-			3) update category prob
-			4) update word prob conditioned on category """
-		self.wordCountsByCat = dict.fromkeys(self.docCategories,0) # count words by category
+
+		self.countCategoryProb(trainFile)
+
+		# calc word prob then remove stop words and recalculate
+		self.countWords(trainFile)
+		print len(self.wordCount)
+		if self.nStopWords > 0:
+			self.stopWords = self.getStopWords(self.nStopWords)
+			self.countWords(trainFile, self.stopWords)
+
+	def countCategoryProb(self, trainFile):
+		""" determine probability for each file type category """
+		self.categoryProb = dict.fromkeys(self.docCategories,0)
 
 		with open(trainFile) as trainFID:
 			for docName in trainFID:
@@ -41,34 +41,37 @@ class NaiveBayesClassifier(object):
 				# store doc count in categoryProb var
 				self.categoryProb[docCategory] += 1 # if key error will want to see it
 
-				with open(docName.strip()) as docFID:
-					# add each document's words to the vocabulary
-					
-					for word in docFID:
-						word = self.preprocessWord(word)
-						# count unique words by doc type
-						self.updateWordProb(word, docCategory) 
-						self.wordCountsByCat[docCategory] += 1
-
 		# normalize categoryProb to prob instead of count
 		total = float(sum(self.categoryProb.values()))
 		# dict comprehension used for efficiency, simply dividing each value by total
 		self.categoryProb = {k: v/total for k, v in self.categoryProb.iteritems()}
 
-		# get stop words based on prob
-		self.setStopWords(self.nStopWords)
+	def countWords(self, trainFile, stopWords = set()):
+		"""For each doc in the training file:
+			1) count word occurance
+			2) record unique words
+			3) update category prob
+			4) update word prob conditioned on category """
+		self.wordCount = dict(); # stores unique word prob
+		self.wordCountsPerCat = dict.fromkeys(self.docCategories,0) # count words by category
 
-	def getWordProb(self, cat, word):
-		"""normalize word probability from count"""
-		vocabLen = len(self.wordCount) - len(self.stopWords)
-		q = self.smoothingConst
+		with open(trainFile) as trainFID:
+			for docName in trainFID:
 
-		# prob: (count + q) / (nWordsByCat + vocabLength)
-		n  = self.wordCountsByCat[cat] - self.stopWordsCount[cat]
-		nk = self.wordCount[word][cat]
-		return (nk + q) / float(n + q*vocabLen)
+				# read in file names of blog documents
+				docCategory = re.match('([a-z]+)', docName).group(0)
 
-	def updateWordProb(self, word, docCategory):
+				with open(docName.strip()) as docFID:
+					# add each document's words to the vocabulary
+					
+					for word in docFID:
+						word = self.preprocessWord(word)
+						if word not in stopWords:
+							# count unique words by doc type
+							self.updateWordCount(word, docCategory) 
+							self.wordCountsPerCat[docCategory] += 1
+
+	def updateWordCount(self, word, docCategory):
 		"""Init/update word count. Data structure is of form {word: {cat1: count1, cat2: count2}}"""
 
 		if word not in self.wordCount:
@@ -77,6 +80,16 @@ class NaiveBayesClassifier(object):
 
 	def preprocessWord(self, word):
 		return word.lower().strip()
+
+	def getWordProb(self, cat, word):
+		""" normalize word probability from count """
+		vocabLen = len(self.wordCount)
+		q = self.smoothingConst
+
+		# prob: (count + q) / (nWordsByCat + vocabLength)
+		n  = self.wordCountsPerCat[cat]
+		nk = self.wordCount[word][cat]
+		return (nk + q) / float(n + q*vocabLen)
 
 	#===============================================
 	# Test
@@ -159,30 +172,26 @@ class NaiveBayesClassifier(object):
 
 		return sortedWords
 
-	def setStopWords(self, nStopWords):
+	def getStopWords(self, nStopWords):
 		""" Set top N words as stop words """
-		self.stopWords = set([])
+		stopWords = set([])
 		if nStopWords == 0:
-			return
+			return stopWords
 
 		sortedWords = self.getSortedWords()
-		stopWords = []
+		stopWordPairs = []
 		for cat,words in sortedWords.iteritems():
 			# take top N words from each category to find top N overall
 			# not the most efficient but simple
-			stopWords += words[0:nStopWords]
+			stopWordPairs += words[0:nStopWords]
 
-		stopWords = sorted(stopWords, key=lambda x: x[1], reverse=True) 		
+		stopWordPairs = sorted(stopWordPairs, key=lambda x: x[1], reverse=True) 		
 		
 		# take only words not prob and remove duplicates
-		stopWords = map(lambda x: x[0], stopWords)
-		for w in stopWords:
+		stopWordPairs = map(lambda x: x[0], stopWordPairs)
+		for w in stopWordPairs:
 			# add top N unique words to stopWords set
-			self.stopWords.add(w)
-			if len(self.stopWords) >= nStopWords: break
+			stopWords.add(w)
+			if len(stopWords) >= nStopWords: break
 
-		# count num words in stopwords per category
-		self.stopWordsCount = dict.fromkeys(self.docCategories, 0)
-		for cat,words in sortedWords.iteritems():
-			catWords = map( lambda x: x[0], words[0:nStopWords] )
-			self.stopWordsCount[cat] = len( self.stopWords.intersection( set(catWords) ) )
+		return stopWords
