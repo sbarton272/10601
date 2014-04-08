@@ -14,9 +14,10 @@ class NaiveBayesClassifier(object):
 		self.docCategories = docCategories
 		self.categoryProb = dict.fromkeys(self.docCategories,0)
 
-		self.wordProb = dict(); # stores unique word prob
+		self.wordCount = dict(); # stores unique word prob
 
 		self.nStopWords = nStopWords
+		self.stopWordsCount = dict.fromkeys(self.docCategories, 0)
 		self.stopWords = set([])
 
 	#===============================================
@@ -29,7 +30,7 @@ class NaiveBayesClassifier(object):
 			2) record unique words
 			3) update category prob
 			4) update word prob conditioned on category """
-		wordCountsByCat = dict.fromkeys(self.docCategories,0) # count words by category
+		self.wordCountsByCat = dict.fromkeys(self.docCategories,0) # count words by category
 
 		with open(trainFile) as trainFID:
 			for docName in trainFID:
@@ -47,36 +48,32 @@ class NaiveBayesClassifier(object):
 						word = self.preprocessWord(word)
 						# count unique words by doc type
 						self.updateWordProb(word, docCategory) 
-						wordCountsByCat[docCategory] += 1
+						self.wordCountsByCat[docCategory] += 1
 
 		# normalize categoryProb to prob instead of count
 		total = float(sum(self.categoryProb.values()))
 		# dict comprehension used for efficiency, simply dividing each value by total
 		self.categoryProb = {k: v/total for k, v in self.categoryProb.iteritems()}
 
-		# normalize prob per category
-		self.normalizeWordProb(wordCountsByCat)
-
 		# get stop words based on prob
 		self.setStopWords(self.nStopWords)
 
-	def normalizeWordProb(self, wordCountsByCat):
+	def getWordProb(self, cat, word):
 		"""normalize word probability from count"""
-		vocabLen = len(self.wordProb)
+		vocabLen = len(self.wordCount) - len(self.stopWords)
 		q = self.smoothingConst
 
-		# updating each count to be a prob: (count + q) / (nWordsByCat + vocabLength)
-		for (word,counts) in self.wordProb.iteritems():
-			for (cat, nk) in counts.iteritems():
-				n = wordCountsByCat[cat]
-				self.wordProb[word][cat] = (nk + q) / float(n + q*vocabLen)
+		# prob: (count + q) / (nWordsByCat + vocabLength)
+		n  = self.wordCountsByCat[cat] - self.stopWordsCount[cat]
+		nk = self.wordCount[word][cat]
+		return (nk + q) / float(n + q*vocabLen)
 
 	def updateWordProb(self, word, docCategory):
 		"""Init/update word count. Data structure is of form {word: {cat1: count1, cat2: count2}}"""
 
-		if word not in self.wordProb:
-			self.wordProb[word] = dict.fromkeys(self.docCategories,0) 
-		self.wordProb[word][docCategory] += 1 
+		if word not in self.wordCount:
+			self.wordCount[word] = dict.fromkeys(self.docCategories,0) 
+		self.wordCount[word][docCategory] += 1 
 
 	def preprocessWord(self, word):
 		return word.lower().strip()
@@ -122,10 +119,10 @@ class NaiveBayesClassifier(object):
 				
 				for word in docFID:
 					word = self.preprocessWord(word)
-					if ((word in self.wordProb) and
+					if ((word in self.wordCount) and
 					   (word not in self.stopWords)):
 						# ignore words not in vocabulary or stopWords
-						prob += ln( self.wordProb[word][cat] )
+						prob += ln( self.getWordProb(cat,word) )
 
 			# update max prob and label
 			if maxProb < prob:
@@ -149,10 +146,10 @@ class NaiveBayesClassifier(object):
 		sortedWords = dict.fromkeys(self.docCategories,None)
 
 		# reorganize (word,prob) dicts into lists
-		for word,probs in self.wordProb.iteritems():
+		for word,counts in self.wordCount.iteritems():
 
 			for cat in self.docCategories:
-				prob = probs[cat]
+				prob = self.getWordProb(cat, word)
 				if (sortedWords[cat] == None): sortedWords[cat] = [] # deal with first case
 				sortedWords[cat].append( (word,prob) ) # store as tuple
 
@@ -175,7 +172,7 @@ class NaiveBayesClassifier(object):
 			# not the most efficient but simple
 			stopWords += words[0:nStopWords]
 
-		stopWords = sorted( stopWords ,key=lambda x: x[1], reverse=True) 		
+		stopWords = sorted(stopWords, key=lambda x: x[1], reverse=True) 		
 		
 		# take only words not prob and remove duplicates
 		stopWords = map(lambda x: x[0], stopWords)
@@ -183,3 +180,9 @@ class NaiveBayesClassifier(object):
 			# add top N unique words to stopWords set
 			self.stopWords.add(w)
 			if len(self.stopWords) >= nStopWords: break
+
+		# count num words in stopwords per category
+		self.stopWordsCount = dict.fromkeys(self.docCategories, 0)
+		for cat,words in sortedWords.iteritems():
+			catWords = map( lambda x: x[0], words[0:nStopWords] )
+			self.stopWordsCount[cat] = len( self.stopWords.intersection( set(catWords) ) )
