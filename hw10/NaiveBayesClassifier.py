@@ -17,7 +17,7 @@ class NaiveBayesClassifier(object):
 		self.wordProb = dict(); # stores unique word prob
 
 		self.nStopWords = nStopWords
-		self.stopWords = []
+		self.stopWords = set([])
 
 	#===============================================
 	# Train
@@ -56,6 +56,9 @@ class NaiveBayesClassifier(object):
 
 		# normalize prob per category
 		self.normalizeWordProb(wordCountsByCat)
+
+		# get stop words based on prob
+		self.setStopWords(self.nStopWords)
 
 	def normalizeWordProb(self, wordCountsByCat):
 		"""normalize word probability from count"""
@@ -119,9 +122,10 @@ class NaiveBayesClassifier(object):
 				
 				for word in docFID:
 					word = self.preprocessWord(word)
-					if word in self.wordProb:
-						# ignore words not in vocabulary
-						prob += ln(self.wordProb[word][cat])
+					if ((word in self.wordProb) and
+					   (word not in self.stopWords)):
+						# ignore words not in vocabulary or stopWords
+						prob += ln( self.wordProb[word][cat] )
 
 			# update max prob and label
 			if maxProb < prob:
@@ -158,6 +162,24 @@ class NaiveBayesClassifier(object):
 
 		return sortedWords
 
-	def getStopWords(self):
+	def setStopWords(self, nStopWords):
 		""" Set top N words as stop words """
+		self.stopWords = set([])
+		if nStopWords == 0:
+			return
+
+		sortedWords = self.getSortedWords()
+		stopWords = []
+		for cat,words in sortedWords.iteritems():
+			# take top N words from each category to find top N overall
+			# not the most efficient but simple
+			stopWords += words[0:nStopWords]
+
+		stopWords = sorted( stopWords ,key=lambda x: x[1], reverse=True) 		
 		
+		# take only words not prob and remove duplicates
+		stopWords = map(lambda x: x[0], stopWords)
+		for w in stopWords:
+			# add top N unique words to stopWords set
+			self.stopWords.add(w)
+			if len(self.stopWords) >= nStopWords: break

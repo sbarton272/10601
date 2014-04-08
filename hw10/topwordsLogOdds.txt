@@ -1,0 +1,5 @@
+Spencer Barton
+10-601
+Naive Bayes Classifier
+
+This was insightful. The words that appeared in this listing were much more interesting and were unique to the different blog types. There were no repeat words and each word is fairly uncommon in everyday English. 

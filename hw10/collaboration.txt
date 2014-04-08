@@ -1,0 +1,5 @@
+Spencer Barton
+10-601
+Naive Bayes Classifier
+
+I worked with Justin Frye. We talked about the algorithm in the book and discussed our notes from recitation. I also told him that we are preprocessing the input.

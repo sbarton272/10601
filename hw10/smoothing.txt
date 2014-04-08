@@ -1,0 +1,14 @@
+Spencer Barton
+10-601
+Naive Bayes Classifier
+
+Q = 5    => 0.6944
+Q = 2    => 0.8056
+Q = 1    => 0.8056
+Q = .5   => 0.8056
+Q = .1   => 0.8333
+Q = .01  => 0.8611
+Q = .001 => 0.8611
+Q = 0    => cannot classify
+
+I found that the classification improved to a point as Q got smaller. Basically what happened was that the words that never occurred in a given category were weighted less and therefore affect the probabilities less. As a result unique words per category got more weight.

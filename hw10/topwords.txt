@@ -1,0 +1,5 @@
+Spencer Barton
+10-601
+Naive Bayes Classifier
+
+The two lists look nearly identical. Both lists contain words like 'the', 'I', 'was', etc. These are all common small words. Stop words would be very useful to pull out more unique words.

@@ -1,0 +1,5 @@
+Spencer Barton
+10-601
+Naive Bayes Classifier
+
+The stop words has little effect until about 40 words then the classification got worse. The words removed as stop words tended to be small common words like "the", "a", "and", etc. and both liberal and conservative blogs had a similar occurance rate for these words. Therefore the stopwords had about equal effect on both blog types and didn't affect classification. Correct classification decreased once more unique words were removed.
