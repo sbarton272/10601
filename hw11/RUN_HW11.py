@@ -13,6 +13,9 @@ def runCmd(cmd):
 print 'Fwd Test Data'
 runCmd(['python','alpha.py', './test/test-dev.txt', './test/test-trans.txt', './test/test-emit.txt', './test/test-prior.txt'])
 
+print 'Bckwd Test Data'
+runCmd(['python','beta.py', './test/test-dev.txt', './test/test-trans.txt', './test/test-emit.txt', './test/test-prior.txt'])
+
 print
 print 'Fwd Real Data'
 # real hw

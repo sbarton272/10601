@@ -69,8 +69,6 @@ class HiddenMarkovModel(object):
 					m = re.match(r'(\S+):(\S+)', tok)
 					Vk = m.group(1)
 					Bij = float(m.group(2))
-					if Bij > 1:
-						print Si, tok, Vk, Bij
 					self.hmmEmit[Si][Vk] = Bij
 
 	def _initHMMPrior(self, priorFileName, delim):
@@ -105,11 +103,11 @@ class HiddenMarkovModel(object):
 			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
 		"""
 		T = len(vObserved)
-		alpha = list()
+		alpha = [0]*T
 
 		# first alpha values per state Si
-		alpha.append( dict() )
 		t = 0
+		alpha[t] = dict()
 		o1 = vObserved[t]
 		for Si in self.getStates():
 			alpha[t][Si] = self.hmmPrior[Si] * self.hmmEmit[Si][o1]
@@ -118,7 +116,7 @@ class HiddenMarkovModel(object):
 		for t in xrange(1,T):
 			# iterate through alphas over time
 			ot = vObserved[t]
-			alpha.append( dict() )
+			alpha[t] = dict()
 
 			for Si in self.getStates():
 				# iterate through states per alpha
@@ -133,6 +131,51 @@ class HiddenMarkovModel(object):
 				alpha[t][Si] = tmpSum * bi
 
 		return alpha
+
+#===============================================
+# Backward Algorithm
+#===============================================
+
+	def backwardAlg(self, vObserved):
+		""" Assuming trained HMM return beta value for given 
+			vObserved (observed vector)
+		"""
+
+		beta = self._getBeta(vObserved)
+		return sum( beta[0].values() )
+
+	def _getBeta(self, vObserved, finalStateProb = 1.0):
+		""" Generate beta values
+			Returns list ordered by time of dicts with state probabilities:
+			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
+		"""
+		T = len(vObserved)
+		beta = [0]*T
+
+		# last beta values per state Si
+		t = T-1
+		beta[t] = dict()
+		for Si in self.getStates():
+			beta[t][Si] = finalStateProb
+
+		# subsequent beta based on prior beta
+		for t in xrange(T-2,-1):
+			# iterate through betas over time
+			ot = vObserved[t+1]
+			beta[t] = dict()
+
+			for Si in self.getStates():
+				# iterate through states per beta
+				tmpSum = 0.0
+
+				for Sj in self.getStates(): 
+					# iterate through next states to get transition prob
+					tmpSum += beta[t+1][Sj] * self.hmmTrans[Si][Sj] * self.hmmEmit[Sj][ot]
+
+				# update beta
+				beta[t][Si] = tmpSum
+
+		return beta
 
 #===============================================
 # Getters
