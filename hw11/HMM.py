@@ -29,9 +29,9 @@ class HiddenMarkovModel(object):
 		""" Given the HMM data in files read the files and set-up the 
 			HMM variables.
 		"""
-		_initHMMTrans(transFileName, delim)
-		_initHMMEmit(emitFileName, delim)
-		_initHMMPrior(priorFileName, delim)
+		self._initHMMTrans(transFileName, delim)
+		self._initHMMEmit(emitFileName, delim)
+		self._initHMMPrior(priorFileName, delim)
 
 	def _initHMMTrans(self, transFileName, delim):
 		""" given file fill in data structure, data split by demiliter
@@ -41,14 +41,14 @@ class HiddenMarkovModel(object):
 		"""
 		with open(transFileName) as FID:
 			for line in FID:
-				tokens = delim.split(line)
+				tokens = line.split(delim)
 				Si = tokens[0]
 				# update transition probabilities
 				self.hmmTrans[Si] = dict()
 				for tok in tokens[1:]:
 					m = re.match(r'(\w+):([\d\.]+)', tok)
-					Sj = m.group(0)
-					Aij = m.group(1)
+					Sj = m.group(1)
+					Aij = float(m.group(2))
 					self.hmmTrans[Si][Sj] = Aij
 
 	def _initHMMEmit(self, emitFileName, delim):
@@ -59,15 +59,15 @@ class HiddenMarkovModel(object):
 		"""
 		with open(emitFileName) as FID:
 			for line in FID:
-				tokens = delim.split(line)
+				tokens = line.split(delim)
 				Si = tokens[0]
 				# update emission probabilities
-				self.hmmEmit = dict()
+				self.hmmEmit[Si] = dict()
 				for tok in tokens[1:]:
 					m = re.match(r'(\w+):([\d\.]+)', tok)
-					Vk = m.group(0)
-					Bij = m.group(1)
-					self.hmmTrans[Si][Vk] = Bij
+					Vk = m.group(1)
+					Bij = float(m.group(2))
+					self.hmmEmit[Si][Vk] = Bij
 
 	def _initHMMPrior(self, priorFileName, delim):
 		""" given file fill in data structure, data split by demiliter 
@@ -77,9 +77,9 @@ class HiddenMarkovModel(object):
 		"""
 		with open(priorFileName) as FID:
 			for line in FID:
-				tokens = delim.split(line)
+				tokens = line.split(delim)
 				Si = tokens[0]
-				Pi = tokens[1]
+				Pi = float(tokens[1])
 				# update prior probabilities
 				self.hmmPrior[Si] = Pi
 
@@ -88,7 +88,7 @@ class HiddenMarkovModel(object):
 #===============================================
 
 	def getStates(self):
-		return set(self.emit.keys())
+		return set(self.hmmEmit.keys())
 
 	def getObservables(self):
-		return set(self.emit.values())
+		return set(self.hmmEmit.values()[0].keys())

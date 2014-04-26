@@ -2,7 +2,12 @@
 # 10-601 
 # HW 11
 
-from subprocess import call
+import subprocess
+
+def runCmd(cmd):
+	process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+	out, err = process.communicate()
+	print(out)
 
 # test with test data
-call(['python','alpha.py', 'test-dev.txt', 'test-trans.txt', 'test-emit.txt', 'test-prior.txt'])
+runCmd(['python','alpha.py', './test/test-dev.txt', './test/test-trans.txt', './test/test-emit.txt', './test/test-prior.txt'])
