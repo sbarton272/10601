@@ -2,7 +2,9 @@
 # 10-601 
 # HW 11
 
-import re
+# TODO functional version instead of for loops
+
+import re, operator
 
 class HiddenMarkovModel(object):
 	"""HiddenMarkovModel
@@ -103,7 +105,7 @@ class HiddenMarkovModel(object):
 			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
 		"""
 		T = len(vObserved)
-		alpha = [0]*T
+		alpha = [None]*T
 
 		# first alpha values per state Si
 		t = 0
@@ -154,7 +156,7 @@ class HiddenMarkovModel(object):
 			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
 		"""
 		T = len(vObserved)
-		beta = [0]*T
+		beta = [None]*T
 
 		# last beta values per state Si
 		t = T-1
@@ -179,6 +181,61 @@ class HiddenMarkovModel(object):
 				# update beta
 				beta[t][Si] = tmpSum
 		return beta
+
+#===============================================
+# Viterbi Algorithm
+#===============================================
+
+	def viterbiAlg(self, vObserved):
+		""" Assuming trained HMM return path value for given 
+			vObserved (observed vector)
+		"""
+		return self._getPath( self._getVP(vObserved) )
+
+	def _getPath(self, VP):
+		""" Takes a set of Viterbi probabilities
+			Returns most likely path
+		"""
+		path = [None] * len(VP)
+		for t in xrange(0,len(VP)):
+			# get max VP at time t and append that state to path
+			path[t] = max(VP[t].iteritems(), key=operator.itemgetter(1))[0]
+		return path
+
+	def _getVP(self, vObserved):
+		""" Generate VP values
+			Returns list ordered by time of dicts with state probabilities:
+			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
+		"""
+		T = len(vObserved)
+		VP = [None]*T
+
+		# first VP values per state Si
+		t = 0
+		VP[t] = dict()
+		o1 = vObserved[t]
+		for Si in self.getStates():
+			VP[t][Si] = self.hmmPrior[Si] * self.hmmEmit[Si][o1]
+
+		# subsequent VP based on prior VP
+		for t in xrange(1,T):
+			# iterate through VPs over time
+			ot = vObserved[t]
+			VP[t] = dict()
+
+			for Si in self.getStates():
+				# iterate through states per VP
+				bi = self.hmmEmit[Si][ot]
+				tmpVP = []
+
+				for Sj in self.getStates(): 
+					# iterate through prior states to get transition prob
+					tmpVP += [ VP[t-1][Sj] * self.hmmTrans[Sj][Si] ]
+
+				# update VP with max of possibilities
+				VP[t][Si] = max(tmpVP) * bi
+
+		return VP
 
 #===============================================
 # Getters
