@@ -84,6 +84,51 @@ class HiddenMarkovModel(object):
 				self.hmmPrior[Si] = Pi
 
 #===============================================
+# Forward Algorithm
+#===============================================
+
+	def forwardAlg(self, vObserved):
+		""" Assuming trained HMM return alpha value for given 
+			vObserved (observed vector)
+		"""
+
+		alpha = self._getAlpha(vObserved)
+		return sum( alpha[-1].values() )
+
+	def _getAlpha(self, vObserved):
+		""" Generate alpha values
+			Returns list ordered by time of dicts with state probabilities:
+			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
+		"""
+		alpha = list()
+		T = len(vObserved)
+
+		# first alpha values per state Si
+		alpha.append( dict() )
+		t = 0
+		o1 = vObserved[t]
+		for Si in self.getStates():
+			alpha[t] = self.hmmPrior[Si] * self.hmmEmit[Si][o1]
+
+		# subsequent alpha based on prior alpha
+		for t in xrange(1,T):
+			# iterate through alphas over time
+			ot = vObserved[t]
+
+			for Si in self.getStates():
+				# iterate through states per alpha
+				bi = self.hmmEmit[Si][ot]
+				tmpSum = 0.0
+
+				for Sj in self.getStates(): 
+					# iterate through prior states to get transition prob
+					tmpSum += alpha[t-1][Sj] * self.hmmTrans[Si][Sj]
+
+				alpha[t][Si] = tmpSum * bi
+
+		return alpha
+
+#===============================================
 # Getters
 #===============================================
 
