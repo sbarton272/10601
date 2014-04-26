@@ -142,7 +142,11 @@ class HiddenMarkovModel(object):
 		"""
 
 		beta = self._getBeta(vObserved)
-		return sum( beta[0].values() )
+		rtrnVal = 0.0
+		o1 = vObserved[0]
+		for Si in self.getStates():
+			rtrnVal += self.hmmPrior[Si] * self.hmmEmit[Si][o1]	* beta[0][Si]		
+		return rtrnVal
 
 	def _getBeta(self, vObserved, finalStateProb = 1.0):
 		""" Generate beta values
@@ -159,7 +163,7 @@ class HiddenMarkovModel(object):
 			beta[t][Si] = finalStateProb
 
 		# subsequent beta based on prior beta
-		for t in xrange(T-2,-1):
+		for t in xrange(T-2,-1,-1):
 			# iterate through betas over time
 			ot = vObserved[t+1]
 			beta[t] = dict()
@@ -174,7 +178,6 @@ class HiddenMarkovModel(object):
 
 				# update beta
 				beta[t][Si] = tmpSum
-
 		return beta
 
 #===============================================

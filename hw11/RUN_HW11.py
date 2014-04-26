@@ -8,6 +8,12 @@ def runCmd(cmd):
 	process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 	out, err = process.communicate()
 	print(out)
+	return out
+
+
+#===============================================
+# Forward Backward
+#===============================================
 
 # test with test data
 print 'Fwd Test Data'
@@ -18,5 +24,11 @@ runCmd(['python','beta.py', './test/test-dev.txt', './test/test-trans.txt', './t
 
 print
 print 'Fwd Real Data'
-# real hw
-runCmd(['python','alpha.py', 'dev.txt', 'hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt'])
+fwdRes = runCmd(['python','alpha.py', 'dev.txt', 'hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt'])
+
+print 'Bckwd Real Data'
+bckwdRes = runCmd(['python','beta.py', 'dev.txt', 'hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt'])
+
+#===============================================
+# Script
+#===============================================
