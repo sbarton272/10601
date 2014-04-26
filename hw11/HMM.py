@@ -41,12 +41,14 @@ class HiddenMarkovModel(object):
 		"""
 		with open(transFileName) as FID:
 			for line in FID:
-				tokens = line.split(delim)
+				tokens = line.strip().split(delim)
 				Si = tokens[0]
 				# update transition probabilities
 				self.hmmTrans[Si] = dict()
+
+				# go token by token to update prob
 				for tok in tokens[1:]:
-					m = re.match(r'(\w+):([\d\.]+)', tok)
+					m = re.match(r'(\S+):(\S+)', tok)
 					Sj = m.group(1)
 					Aij = float(m.group(2))
 					self.hmmTrans[Si][Sj] = Aij
@@ -59,14 +61,16 @@ class HiddenMarkovModel(object):
 		"""
 		with open(emitFileName) as FID:
 			for line in FID:
-				tokens = line.split(delim)
+				tokens = line.strip().split(delim)
 				Si = tokens[0]
 				# update emission probabilities
 				self.hmmEmit[Si] = dict()
 				for tok in tokens[1:]:
-					m = re.match(r'(\w+):([\d\.]+)', tok)
+					m = re.match(r'(\S+):(\S+)', tok)
 					Vk = m.group(1)
 					Bij = float(m.group(2))
+					if Bij > 1:
+						print Si, tok, Vk, Bij
 					self.hmmEmit[Si][Vk] = Bij
 
 	def _initHMMPrior(self, priorFileName, delim):
@@ -77,7 +81,7 @@ class HiddenMarkovModel(object):
 		"""
 		with open(priorFileName) as FID:
 			for line in FID:
-				tokens = line.split(delim)
+				tokens = line.strip().split(delim)
 				Si = tokens[0]
 				Pi = float(tokens[1])
 				# update prior probabilities
@@ -100,20 +104,21 @@ class HiddenMarkovModel(object):
 			Returns list ordered by time of dicts with state probabilities:
 			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
 		"""
-		alpha = list()
 		T = len(vObserved)
+		alpha = list()
 
 		# first alpha values per state Si
 		alpha.append( dict() )
 		t = 0
 		o1 = vObserved[t]
 		for Si in self.getStates():
-			alpha[t] = self.hmmPrior[Si] * self.hmmEmit[Si][o1]
+			alpha[t][Si] = self.hmmPrior[Si] * self.hmmEmit[Si][o1]
 
 		# subsequent alpha based on prior alpha
 		for t in xrange(1,T):
 			# iterate through alphas over time
 			ot = vObserved[t]
+			alpha.append( dict() )
 
 			for Si in self.getStates():
 				# iterate through states per alpha
@@ -122,8 +127,9 @@ class HiddenMarkovModel(object):
 
 				for Sj in self.getStates(): 
 					# iterate through prior states to get transition prob
-					tmpSum += alpha[t-1][Sj] * self.hmmTrans[Si][Sj]
+					tmpSum += alpha[t-1][Sj] * self.hmmTrans[Sj][Si]
 
+				# update alpha
 				alpha[t][Si] = tmpSum * bi
 
 		return alpha

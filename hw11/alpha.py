@@ -2,7 +2,9 @@
 # 10-601 
 # HW 11
 
-import sys, HMM
+import sys, HMM, math
+
+DEBUG = False
 
 #===============================================
 # Script
@@ -17,8 +19,21 @@ HMM = HMM.HiddenMarkovModel()
 
 HMM.initHMM(TRANS_FILE_NAME, EMIT_FILE_NAME, PRIOR_FILE_NAME)
 
-print HMM.hmmPrior
-print HMM.hmmTrans
-print HMM.hmmEmit
-print HMM.getStates()
-print HMM.getObservables()
+# for debug
+if DEBUG:
+	print 'prior', HMM.hmmPrior
+	print 'trans', HMM.hmmTrans
+	print 'emit', HMM.hmmEmit
+	print 'states', HMM.getStates()
+	print 'observables', HMM.getObservables()
+
+# actual output
+delim = ' '
+with open(DEV_FILE_NAME) as FID: 
+	for line in FID:
+		vObserved = line.strip().split(delim)
+		print math.log(HMM.forwardAlg(vObserved))
+
+		# debug
+		if DEBUG: print 'alpha:', vObserved, HMM._getAlpha(vObserved)
+
