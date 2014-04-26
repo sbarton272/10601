@@ -1,0 +1,7 @@
+Spencer Barton
+10-601 
+HW 11
+collaboration.txt
+
+I worked with Justin Frye to understand the various algorithms of the HMM. We went over lecture and recitation slides to understand the forward, backward and Baum-Welsch algorithms.
+

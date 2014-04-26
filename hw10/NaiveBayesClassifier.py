@@ -23,7 +23,6 @@ class NaiveBayesClassifier(object):
 
 		# calc word prob then remove stop words and recalculate
 		self.countWords(trainFile)
-		print len(self.wordCount)
 		if self.nStopWords > 0:
 			self.stopWords = self.getStopWords(self.nStopWords)
 			self.countWords(trainFile, self.stopWords)
@@ -132,8 +131,7 @@ class NaiveBayesClassifier(object):
 				
 				for word in docFID:
 					word = self.preprocessWord(word)
-					if ((word in self.wordCount) and
-					   (word not in self.stopWords)):
+					if word in self.wordCount:
 						# ignore words not in vocabulary or stopWords
 						prob += ln( self.getWordProb(cat,word) )
 
