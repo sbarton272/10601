@@ -350,6 +350,7 @@ class HiddenMarkovModel(object):
 		#  of iterations are made
 		nIter = 0
 		avgLLDelta = minAvgLLDelta
+		M = len(trainingData)
 		# TODO prealloc xi and gamma to make faster
 		while ( (nIter < maxNIter) and (avgLLDelta >= minAvgLLDelta) ):
 
@@ -357,7 +358,7 @@ class HiddenMarkovModel(object):
 			xi = list()
 			gamma = list()
 
-			for m in xrange(0,len(trainingData)):
+			for m in xrange(0,M):
 				# iterate through all training data to get values xi and gamma
 				# per observed vector
 				# xi is the expected probability of transitioning state i->j
@@ -377,15 +378,45 @@ class HiddenMarkovModel(object):
 				# rtrn vector over time for Si
 				gamma[m] = self._getGammaM(alpha, beta)
 
-			for m in xrange(0,len(trainingData)):
-				# update HMM
-
-				# TODO
-				pass
+			# update HMM
+			self._updateHmmPrior(gamma)
+			self._updateHmmTrans(xi)
+			self._updateHmmEmit(gamma,trainingData)
 
 			# caclulate average log likelihood
 
 			# TODO
+
+	def _updateHmmPrior(self, gamma):
+		""" update HMM model prior
+			prior is the average prob of transitioning through the given state 
+			@ t=1
+		"""
+		M = len(gamma)
+		for Si in self.getStates():
+			# calculate hmmPrior[Si]
+
+			probSum = 0.0
+			for m in xrange(0,M):
+				# sum all prob over samples of going though state Si at t=0
+				probSum += gamma[m][0][Si]
+
+			self.hmmPrior[Si] = probSum / M
+
+	def _updateHmmTrans(self, xi):
+		""" update HMM model transition probabilities
+			Prob is based on average flow through transition i->j
+		"""
+		for Si in self.getStates():
+			for Sj in self.getStates():
+				# calculate hmmTrans[Si][Sj]
+
+
+
+
+	def _updateHmmEmit(self, gamma,trainingData):
+		""" update HMM model """
+
 
 	def _getXiM(self, alpha, beta, vObserved):
 		""" Return matrix over time for Si->Sj
