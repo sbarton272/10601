@@ -1,0 +1,1 @@
+the_DT date_NN ,_PC october_NN 8_OT ,_PC 1957_OT ,_PC immediately_PR caught_VB the_DT inspector_NN 's_OT eye_NN ._PC

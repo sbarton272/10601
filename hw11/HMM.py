@@ -4,7 +4,7 @@
 
 # TODO functional version instead of for loops
 
-import re, operator
+import re, operator, copy
 
 class HiddenMarkovModel(object):
 	"""HiddenMarkovModel
@@ -190,25 +190,24 @@ class HiddenMarkovModel(object):
 		""" Assuming trained HMM return path value for given 
 			vObserved (observed vector)
 		"""
-		return self._getPath( self._getVP(vObserved) )
+		return self._getPath( vObserved )
 
-	def _getPath(self, VP):
-		""" Takes a set of Viterbi probabilities
-			Returns most likely path
-		"""
-		path = [None] * len(VP)
-		for t in xrange(0,len(VP)):
-			# get max VP at time t and append that state to path
-			path[t] = max(VP[t].iteritems(), key=operator.itemgetter(1))[0]
+	def _getPath(self, vObserved):
+		path, VP = self._getPathVP(vObserved)
 		return path
 
 	def _getVP(self, vObserved):
-		""" Generate VP values
-			Returns list ordered by time of dicts with state probabilities:
+		path, VP = self._getPathVP(vObserved)
+		return VP
+
+	def _getPathVP(self, vObserved):
+		""" Generate VP and path values
+			TODO Returns list ordered by time of dicts with state probabilities:
 			[ {S1:p1, S2:p2}, {S1:p3, S2:p4} ]
 		"""
 		T = len(vObserved)
-		VP = [None]*T
+		VP = [None]*T # list of dicts
+		paths = dict.fromkeys(self.getStates()) # dict of lists
 
 		# first VP values per state Si
 		t = 0
@@ -216,6 +215,7 @@ class HiddenMarkovModel(object):
 		o1 = vObserved[t]
 		for Si in self.getStates():
 			VP[t][Si] = self.hmmPrior[Si] * self.hmmEmit[Si][o1]
+			paths[Si] = []
 
 		# subsequent VP based on prior VP
 		for t in xrange(1,T):
@@ -226,16 +226,32 @@ class HiddenMarkovModel(object):
 			for Si in self.getStates():
 				# iterate through states per VP
 				bi = self.hmmEmit[Si][ot]
-				tmpVP = []
+				maxVP = 0.0
 
 				for Sj in self.getStates(): 
-					# iterate through prior states to get transition prob
-					tmpVP += [ VP[t-1][Sj] * self.hmmTrans[Sj][Si] ]
+					# iterate through prior states to get max VP and which state it came from
+					tmpVP = VP[t-1][Sj] * self.hmmTrans[Sj][Si] * bi
+					if tmpVP > maxVP:
+						maxVP = tmpVP
+						maxSj = Sj
 
 				# update VP with max of possibilities
-				VP[t][Si] = max(tmpVP) * bi
+				VP[t][Si] = maxVP
 
-		return VP
+				# update paths
+				paths[Si].append( maxSj )
+
+		# final state is max of VP_T
+		S_T = max(VP[T-1].iteritems(), key=operator.itemgetter(1))[0]
+		# Knowing final state, path is optimal path to that state
+		# Pull out path for state S_T over time, final state in path is S_T
+		path = copy.copy( paths[S_T] )
+		path.append(S_T)
+
+		print S_T, paths
+		print VP
+
+		return path, VP
 
 #===============================================
 # Getters
