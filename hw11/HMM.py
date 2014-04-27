@@ -407,16 +407,55 @@ class HiddenMarkovModel(object):
 		""" update HMM model transition probabilities
 			Prob is based on average flow through transition i->j
 		"""
+		M = len(xi)
 		for Si in self.getStates():
+
+			denominator = 0.0
 			for Sj in self.getStates():
 				# calculate hmmTrans[Si][Sj]
 
+				numerator = 0.0
+				for m in xrange(0,M):
+					# calculate numerator, sum xi over M
+					T = len(xi[m])
+					for t in xrange(0, T-1):
+						# sum xi over T
+						prob = xi[m][t][Si][Sj]
+						numerator += prob
+						denominator += prob
 
+				self.hmmTrans[Si][Sj] = numerator
 
+			# normalize probabilities
+			for Sj in self.getStates():
+				self.hmmTrans[Si][Sj] = self.hmmTrans[Si][Sj] / denominator
 
 	def _updateHmmEmit(self, gamma,trainingData):
 		""" update HMM model """
 
+		M = len(trainingData)
+
+		for Si in self.getStates():
+			for vk in self.getObservables():
+				# update hmmEmit[Si][vk]
+
+				denominator = 0.0
+				numerator = 0.0
+				for m in xrange(0,M):
+					# iterate over all training data
+					vObserved = trainingData[m]
+					T = len(vObserved)
+					for t in xrange(0,T):
+						# iterate over all time
+						ot = vObserved[t]
+						prob = gamma[m][t][Si]
+						denominator += prob
+						if ot == vk:
+							# count only instance where in state Si and output
+							# of training data is vk
+							numerator += prob
+
+				self.hmmEmit[Si][vk] = numerator / denominator
 
 	def _getXiM(self, alpha, beta, vObserved):
 		""" Return matrix over time for Si->Sj
