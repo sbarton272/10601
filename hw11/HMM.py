@@ -374,6 +374,13 @@ class HiddenMarkovModel(object):
 				# get alpha and beta values for current HMM configuration
 				alpha = self._getAlpha(vObserved)
 				beta  = self._getBeta(vObserved)
+				
+				# if m == 0:
+				# 	alpha = [{'s': 0.34, 't': 0.08}, {'s': 0.066, 't': 0.155}, {'s': 0.02118, 't': 0.09285}, {'s': 0.00625, 't': 0.04919}]
+				# 	beta = [{'s': 0.13315, 't': 0.12729}, {'s': 0.2561, 't': 0.2487}, {'s': 0.47, 't': 0.49}, {'s': 1.0, 't': 1.0}]
+				# else:
+				# 	alpha = [{'s': 0.51, 't': 0.08}, {'s': 0.0644, 't': 0.2145}, {'s': 0.0209, 't': 0.119}]
+				# 	beta = [{'s': 0.2421, 't': 0.2507}, {'s': 0.53, 't': 0.51}, {'s': 1.0, 't': 1.0}]
 
 				# calculate xi and gamma
 				# rtrn matrix over time for Si->Sj
@@ -381,8 +388,17 @@ class HiddenMarkovModel(object):
 				# rtrn vector over time for Si
 				gamma[m] = self._getGammaM(alpha, beta)
 
-			print 'xi', xi
-			print 'gamma', gamma
+				# print '----------'
+				# print vObserved
+				# print 'alpha', alpha
+				# print 'beta', beta
+				# print 'xi'
+				# for x in xi[m]:
+				# 	print x
+				# print 'gamma'
+				# for g in gamma[m]:
+				# 	print g
+				# print '----------'
 
 			# update HMM
 			self._updateHmmPrior(gamma)

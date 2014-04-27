@@ -44,3 +44,11 @@ if DEBUG:
 	print 'observables', HMM.getObservables()
 
 HMM.baumWelchAlg(trainingData)
+
+# for debug
+if DEBUG:
+	print 'prior', HMM.hmmPrior
+	print 'trans', HMM.hmmTrans
+	print 'emit', HMM.hmmEmit
+	print 'states', HMM.getStates()
+	print 'observables', HMM.getObservables()
