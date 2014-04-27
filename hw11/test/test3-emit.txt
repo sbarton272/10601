@@ -1,0 +1,5 @@
+N <s>:0.0 time:0.1 flies:0.1 like:0.0 an:0.0 arrow:0.1
+V <s>:0.0 time:0.1 flies:0.2 like:0.2 an:0.0 arrow:0.0
+P <s>:0.0 time:0.0 flies:0.0 like:0.1 an:0.0 arrow:0.0
+D <s>:0.0 time:0.0 flies:0.0 like:0.0 an:0.3 arrow:0.0
+BOS <s>:1.0 time:0.0 flies:0.0 like:0.0 an:0.0 arrow:0.0

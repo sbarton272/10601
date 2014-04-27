@@ -4,7 +4,7 @@
 
 # TODO functional version instead of for loops
 
-import re, operator, copy
+import re, operator, copy, random
 
 class HiddenMarkovModel(object):
 	"""HiddenMarkovModel
@@ -19,9 +19,10 @@ class HiddenMarkovModel(object):
 	"""
 	def __init__(self):
 		# 3 elements define the HMM
-		self.hmmPrior = dict();
-		self.hmmTrans = dict();
-		self.hmmEmit = dict();
+		self.hmmPrior = dict()
+		self.hmmTrans = dict()
+		self.hmmEmit = dict()
+		self.bInitializedTopology = False
 
 #===============================================
 # Initialization from files
@@ -34,6 +35,7 @@ class HiddenMarkovModel(object):
 		self._initHMMTrans(transFileName, delim)
 		self._initHMMEmit(emitFileName, delim)
 		self._initHMMPrior(priorFileName, delim)
+		self.bInitializedTopology = True
 
 	def _initHMMTrans(self, transFileName, delim):
 		""" given file fill in data structure, data split by demiliter
@@ -86,6 +88,78 @@ class HiddenMarkovModel(object):
 				Pi = float(tokens[1])
 				# update prior probabilities
 				self.hmmPrior[Si] = Pi
+
+
+	def _initHMMRand(self, vocabulary):
+		""" Create random probabilities for HMM. Probabilities are normalized
+			to add up to 1 as appropriate.
+			Vocabulary is used so that HMMEmit include the full training 
+			vocabulary.
+			Requires that the HMM be initialized with file based probabilities
+			so as to have the correct topology in place.
+		"""
+		if !self.bInitializedTopology:
+			raise("Topology not initialized; Random valued HMM cannot be generated")
+
+		self._initHMMPriorRand()
+		self._initHMMEmitRand()
+		self._initHMMTransRand()
+
+	def _initHMMPriorRand(self):
+		""" Assigns random prior per state """
+		sumP = 0.0
+		for Si in self.getStates():
+			p = random.random() # [0,1)
+			
+			if p == 0.0:
+				p = .5 # p=0 is problematic
+			
+			self.hmmPrior[Si] = p
+			sumP += p
+		
+		# normalize so total prob is 1
+		for Si in self.getStates():
+			self.hmmPrior[Si] = self.hmmPrior[Si] / sumP
+	
+	def _initHMMEmitRand(self, vocabulary):
+		""" Assigns random emission per state 
+			vocabulary is a set
+		"""
+		for Si in self.getStates():
+			self.hmmEmit[Si] = dict.fromkeys(vocabulary)
+
+			for word in vocabulary:
+				sumP = 0.0
+
+				p = random.random() # [0,1)
+				if p == 0.0:
+					p = .5 # p=0 is problematic
+
+				self.hmmEmit[Si][word] = p
+				sumP += p
+
+			# normalize so total prob per state is 1
+			for word in vocabulary:
+				self.hmmEmit[Si][word] = self.hmmEmit[Si][word] / sumP
+
+	def _initHMMTransRand(self):
+		""" Assigns random transition prob per state """
+		for Si in self.getStates():
+			self.hmmTrans[Si] = dict.fromkeys(vocabulary)
+
+			for Sj in self.getStates():
+				sumP = 0.0
+
+				p = random.random() # [0,1)
+				if p == 0.0:
+					p = .5 # p=0 is problematic
+
+				self.hmmTrans[Si][Sj] = p
+				sumP += p
+
+			# normalize so total prob per state is 1
+			for Sj in self.getStates():
+				self.hmmTrans[Si][Sj] = self.hmmTrans[Si][Sj] / sumP
 
 #===============================================
 # Forward Algorithm
@@ -252,6 +326,35 @@ class HiddenMarkovModel(object):
 		path.reverse()
 
 		return path, VP
+
+#===============================================
+# Baum-Welch Algorithm
+#===============================================
+
+def baumWelchAlg(self, trainFileName, transFileName = None, emitFileName = None,
+				 priorFileName = None, delim = ' ', maxIterStep = 0.1,
+				 maxNIter = 20):
+	""" Takes in training data and generates HMM model. Starting HMM parameters
+		can be specified through the assorted files. Training convergence 
+		parameters can also be specified.
+	"""
+
+	# place training data in list of sentence lists
+	with open(trainFileName) as FID:
+		trainingData = list()
+		vocabulary = set() # vocabulary contains unique words
+		for line in FID:
+			data = line.strip().split(delim)
+			trainingData.append( data )
+			vocabulary.union(set(data))
+
+	# Step 1: Initialize HMM
+	if (transFileName != None and emitFileName != None and 
+			priorFileName != None):
+		self.initHMM(transFileName, emitFileName, priorFileName, delim)
+	else:
+		# random value generated for probabilities in state model
+		self._initHMMRand()
 
 #===============================================
 # Getters
