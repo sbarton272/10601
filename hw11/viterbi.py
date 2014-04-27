@@ -4,7 +4,7 @@
 
 import sys, HMM
 
-DEBUG = True
+DEBUG = False
 
 #===============================================
 # Script
