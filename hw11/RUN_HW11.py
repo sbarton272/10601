@@ -49,5 +49,4 @@ def runCmd(cmd):
 # print 'Fwd-Bckwd', fwdRes == bckwdRes
 # runCmd(['python','eval.py','dev-tag.txt',outFile])
 
-print 'Viterbi Real Data'
-paths = runCmd(['python','viterbi.py', 'test/test2-dev.txt', 'hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt'])
+runCmd(['python','viterbi.py', 'test/test3-dev.txt', 'test/test3-trans.txt', 'test/test3-emit.txt', 'test/test3-prior.txt'])

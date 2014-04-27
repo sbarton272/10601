@@ -95,7 +95,6 @@ class HiddenMarkovModel(object):
 		""" Assuming trained HMM return alpha value for given 
 			vObserved (observed vector)
 		"""
-
 		alpha = self._getAlpha(vObserved)
 		return sum( alpha[-1].values() )
 
@@ -227,6 +226,7 @@ class HiddenMarkovModel(object):
 				# iterate through states per VP
 				bi = self.hmmEmit[Si][ot]
 				maxVP = 0.0
+				maxSj = None
 
 				for Sj in self.getStates(): 
 					# iterate through prior states to get max VP and which state it came from
@@ -242,14 +242,14 @@ class HiddenMarkovModel(object):
 				paths[Si].append( maxSj )
 
 		# final state is max of VP_T
-		S_T = max(VP[T-1].iteritems(), key=operator.itemgetter(1))[0]
-		# Knowing final state, path is optimal path to that state
-		# Pull out path for state S_T over time, final state in path is S_T
-		path = copy.copy( paths[S_T] )
-		path.append(S_T)
-
-		print S_T, paths
-		print VP
+		St = max(VP[T-1].iteritems(), key=operator.itemgetter(1))[0]
+		# Backtrace through paths from t = T-1 to 1 (in this case -1 due to 0 indexing)
+		path = []
+		for t in xrange(T-2,-1,-1):
+			path.append(St) # fill in reverse order
+			St = paths[St][t]
+		path.append(St)
+		path.reverse()
 
 		return path, VP
 
