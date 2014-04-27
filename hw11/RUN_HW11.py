@@ -50,6 +50,11 @@ runCmd(['python','baumwelch.py', './test/test2-dev.txt'])
 # with open(outFile, 'w') as FID:
 # 	FID.write(paths)
 
+print 'Baum Welch Real Data'
+runCmd(['python','baumwelch.py', 'train.txt', 'hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt'])
+runCmd(['python','baumwelch.py', 'train.txt'])
+
+
 # print 'Correctness:'
 # print 'Fwd-Bckwd', fwdRes == bckwdRes
 # runCmd(['python','eval.py','dev-tag.txt',outFile])

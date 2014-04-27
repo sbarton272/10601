@@ -90,7 +90,7 @@ class HiddenMarkovModel(object):
 				self.hmmPrior[Si] = Pi
 
 
-	def initHMMRand(self, vocabulary):
+	def initHMMRand(self, states, vocabulary):
 		""" Create random probabilities for HMM. Probabilities are normalized
 			to add up to 1 as appropriate.
 			Vocabulary is used so that HMMEmit include the full training 
@@ -98,19 +98,18 @@ class HiddenMarkovModel(object):
 			Requires that the HMM be initialized with file based probabilities
 			so as to have the correct topology in place.
 		"""
-		if not self.bInitializedTopology:
-			raise("Topology not initialized; Random valued HMM cannot be generated")
+		self._initHMMPriorRand(states)
+		self._initHMMEmitRand(states, vocabulary)
+		self._initHMMTransRand(states)
+		self.bInitializedTopology = True
 
-		self._initHMMPriorRand()
-		self._initHMMEmitRand(vocabulary)
-		self._initHMMTransRand()
-
-	def _initHMMPriorRand(self):
+	def _initHMMPriorRand(self, states):
 		""" Assigns random prior per state 
 			Assumes that topology has already been initialized
 		"""
-		sumP = 0.0
-		for Si in self.getStates():
+		self.hmmPrior = dict.fromkeys(states)
+		sumP = 0.0		
+		for Si in states:
 			p = random.random() # [0,1)
 			
 			if p == 0.0:
@@ -120,16 +119,17 @@ class HiddenMarkovModel(object):
 			sumP += p
 		
 		# normalize so total prob is 1
-		for Si in self.getStates():
+		for Si in states:
 			self.hmmPrior[Si] = self.hmmPrior[Si] / sumP
 	
-	def _initHMMEmitRand(self, vocabulary):
+	def _initHMMEmitRand(self, states, vocabulary):
 		""" Assigns random emission per state 
 			vocabulary is a set
 			Assumes that topology has already been initialized
 		"""
-		print vocabulary
-		for Si in self.getStates():
+		self.hmmEmit = dict.fromkeys(states)
+
+		for Si in states:
 			self.hmmEmit[Si] = dict.fromkeys(vocabulary)
 
 			sumP = 0.0
@@ -146,14 +146,17 @@ class HiddenMarkovModel(object):
 			for word in vocabulary:
 				self.hmmEmit[Si][word] = self.hmmEmit[Si][word] / sumP
 
-	def _initHMMTransRand(self):
+	def _initHMMTransRand(self, states):
 		""" Assigns random transition prob per state 
 			Assumes that topology has already been initialized
 		"""
-		for Si in self.getStates():
+		self.hmmTrans = dict.fromkeys(states)
 
+		for Si in states:
+
+			self.hmmTrans[Si] = dict.fromkeys(states)
 			sumP = 0.0
-			for Sj in self.getStates():
+			for Sj in states:
 
 				p = random.random() # [0,1)
 				if p == 0.0:
@@ -163,7 +166,7 @@ class HiddenMarkovModel(object):
 				sumP += p
 
 			# normalize so total prob per state is 1
-			for Sj in self.getStates():
+			for Sj in states:
 				self.hmmTrans[Si][Sj] = self.hmmTrans[Si][Sj] / sumP
 
 #===============================================
@@ -174,6 +177,9 @@ class HiddenMarkovModel(object):
 		""" Assuming trained HMM return alpha value for given 
 			vObserved (observed vector)
 		"""
+		if not self.bInitializedTopology:
+			raise("Cannot evaluate without initialized topology")
+
 		alpha = self._getAlpha(vObserved)
 		return sum( alpha[-1].values() )
 
@@ -220,6 +226,8 @@ class HiddenMarkovModel(object):
 		""" Assuming trained HMM return beta value for given 
 			vObserved (observed vector)
 		"""
+		if not self.bInitializedTopology:
+			raise("Cannot evaluate without initialized topology")
 
 		beta = self._getBeta(vObserved)
 		rtrnVal = 0.0
@@ -268,6 +276,8 @@ class HiddenMarkovModel(object):
 		""" Assuming trained HMM return path value for given 
 			vObserved (observed vector)
 		"""
+		if not self.bInitializedTopology:
+			raise("Cannot decode without initialized topology")
 		return self._getPath( vObserved )
 
 	def _getPath(self, vObserved):
@@ -353,7 +363,8 @@ class HiddenMarkovModel(object):
 		avgCurLL   = self._calcAvgLL(trainingData)
 		avgPastLL  = None
 
-		print avgCurLL # TODO may not want this print
+		if printAvgLL:
+			print avgCurLL # TODO may not want this print
 
 		M = len(trainingData)
 		while ( (nIter < maxNIter) and (avgLLDelta >= minAvgLLDelta) ):
@@ -375,30 +386,11 @@ class HiddenMarkovModel(object):
 				alpha = self._getAlpha(vObserved)
 				beta  = self._getBeta(vObserved)
 				
-				# if m == 0:
-				# 	alpha = [{'s': 0.34, 't': 0.08}, {'s': 0.066, 't': 0.155}, {'s': 0.02118, 't': 0.09285}, {'s': 0.00625, 't': 0.04919}]
-				# 	beta = [{'s': 0.13315, 't': 0.12729}, {'s': 0.2561, 't': 0.2487}, {'s': 0.47, 't': 0.49}, {'s': 1.0, 't': 1.0}]
-				# else:
-				# 	alpha = [{'s': 0.51, 't': 0.08}, {'s': 0.0644, 't': 0.2145}, {'s': 0.0209, 't': 0.119}]
-				# 	beta = [{'s': 0.2421, 't': 0.2507}, {'s': 0.53, 't': 0.51}, {'s': 1.0, 't': 1.0}]
-
 				# calculate xi and gamma
 				# rtrn matrix over time for Si->Sj
 				xi[m] = self._getXiM(alpha, beta, vObserved)
 				# rtrn vector over time for Si
 				gamma[m] = self._getGammaM(alpha, beta)
-
-				# print '----------'
-				# print vObserved
-				# print 'alpha', alpha
-				# print 'beta', beta
-				# print 'xi'
-				# for x in xi[m]:
-				# 	print x
-				# print 'gamma'
-				# for g in gamma[m]:
-				# 	print g
-				# print '----------'
 
 			# update HMM
 			self._updateHmmPrior(gamma)
@@ -411,9 +403,8 @@ class HiddenMarkovModel(object):
 			avgLLDelta = avgCurLL - avgPastLL
 			nIter += 1
 
-			print avgCurLL
-
-
+			if printAvgLL:
+				print avgCurLL
 
 	def _calcAvgLL(self, trainingData):
 		""" caclulate average log likelihood over training data given HMM """

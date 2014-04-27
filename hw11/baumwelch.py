@@ -6,6 +6,8 @@ import sys, HMM, math
 
 DEBUG = True
 
+STATES = ['PR', 'VB', 'RB', 'NN', 'PC', 'JJ', 'DT', 'OT']
+
 #===============================================
 # Script
 #===============================================
@@ -23,6 +25,7 @@ with open(TRAIN_FILE_NAME) as FID:
 		trainingData.append( data )
 		vocabulary.update(set(data))
 
+# random prob assignment or use provided files
 if len(sys.argv) == 5:
 	# initialization files
 	TRANS_FILE_NAME = sys.argv[2]
@@ -31,9 +34,7 @@ if len(sys.argv) == 5:
 	HMM.initHMM(TRANS_FILE_NAME, EMIT_FILE_NAME, PRIOR_FILE_NAME)
 else:
 	# init topology with standard files
-	HMM.initHMM('hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt')
-	# replace probabilities, emission vocabulary changes as well
-	HMM.initHMMRand(vocabulary)
+	HMM.initHMMRand(STATES, vocabulary)
 
 # for debug
 if DEBUG:

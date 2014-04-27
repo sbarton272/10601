@@ -3,5 +3,5 @@ Spencer Barton
 HW 11
 collaboration.txt
 
-I worked with Justin Frye to understand the various algorithms of the HMM. We went over lecture and recitation slides to understand the forward, backward and Baum-Welsch algorithms.
+I worked with Justin Frye to understand the various algorithms of the HMM. We went over lecture and recitation slides to understand the forward, backward, Viterbi and Baum-Welsch algorithms. We worked through the examples from the class notes together as well as an example for Viterbi that we found online.
 
