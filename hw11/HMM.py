@@ -4,7 +4,7 @@
 
 # TODO functional version instead of for loops
 
-import re, operator, copy, random
+import re, operator, copy, random, math
 
 class HiddenMarkovModel(object):
 	"""HiddenMarkovModel
@@ -350,13 +350,16 @@ class HiddenMarkovModel(object):
 		#  of iterations are made
 		nIter = 0
 		avgLLDelta = minAvgLLDelta
-		M = len(trainingData)
-		# TODO prealloc xi and gamma to make faster
-		while ( (nIter < maxNIter) and (avgLLDelta >= minAvgLLDelta) ):
+		avgCurLL   = self._calcAvgLL(trainingData)
+		avgPastLL  = None
 
+		print avgCurLL # TODO may not want this print
+
+		M = len(trainingData)
+		while ( (nIter < maxNIter) and (avgLLDelta >= minAvgLLDelta) ):
 			# clear every iteration
-			xi = list()
-			gamma = list()
+			xi = [None]*M
+			gamma = [None]*M
 
 			for m in xrange(0,M):
 				# iterate through all training data to get values xi and gamma
@@ -378,14 +381,31 @@ class HiddenMarkovModel(object):
 				# rtrn vector over time for Si
 				gamma[m] = self._getGammaM(alpha, beta)
 
+			print 'xi', xi
+			print 'gamma', gamma
+
 			# update HMM
 			self._updateHmmPrior(gamma)
 			self._updateHmmTrans(xi)
 			self._updateHmmEmit(gamma,trainingData)
 
 			# caclulate average log likelihood
+			avgPastLL = avgCurLL
+			avgCurLL = self._calcAvgLL(trainingData)
+			avgLLDelta = avgCurLL - avgPastLL
+			nIter += 1
 
-			# TODO
+			print avgCurLL
+
+
+
+	def _calcAvgLL(self, trainingData):
+		""" caclulate average log likelihood over training data given HMM """
+		sumLL = 0.0
+		M = len(trainingData)
+		for m in xrange(0,M):
+			sumLL += math.log( self.forwardAlg( trainingData[m] ) )
+		return sumLL / M
 
 	def _updateHmmPrior(self, gamma):
 		""" update HMM model prior
@@ -462,7 +482,7 @@ class HiddenMarkovModel(object):
 			Given alpha, beta and vObserved which are all over time
 		"""	
 		T = len(alpha)
-		xi = [None] * T
+		xi = [None] * (T-1)
 
 		# iterate over time and state i and then state j to calculate the 
 		# probability of transitioning i->j @ t.
@@ -489,6 +509,7 @@ class HiddenMarkovModel(object):
 			for Si in self.getStates():
 				for Sj  in self.getStates():
 					xi[t][Si][Sj] = xi[t][Si][Sj] / totalProb
+		return xi
 
 
 	def _getGammaM(self, alpha, beta):

@@ -28,7 +28,7 @@ def runCmd(cmd):
 
 print 'Baum Welch Test Data'
 runCmd(['python','baumwelch.py', './test/test4-train.txt', './test/test4-trans.txt', './test/test4-emit.txt', './test/test4-prior.txt'])
-runCmd(['python','baumwelch.py', './test/test2-dev.txt'])
+# runCmd(['python','baumwelch.py', './test/test2-dev.txt'])
 
 # print 'Correctness:'
 # print 'Fwd', alpha == beta
