@@ -90,7 +90,7 @@ class HiddenMarkovModel(object):
 				self.hmmPrior[Si] = Pi
 
 
-	def _initHMMRand(self, vocabulary):
+	def initHMMRand(self, vocabulary):
 		""" Create random probabilities for HMM. Probabilities are normalized
 			to add up to 1 as appropriate.
 			Vocabulary is used so that HMMEmit include the full training 
@@ -98,15 +98,17 @@ class HiddenMarkovModel(object):
 			Requires that the HMM be initialized with file based probabilities
 			so as to have the correct topology in place.
 		"""
-		if !self.bInitializedTopology:
+		if not self.bInitializedTopology:
 			raise("Topology not initialized; Random valued HMM cannot be generated")
 
 		self._initHMMPriorRand()
-		self._initHMMEmitRand()
+		self._initHMMEmitRand(vocabulary)
 		self._initHMMTransRand()
 
 	def _initHMMPriorRand(self):
-		""" Assigns random prior per state """
+		""" Assigns random prior per state 
+			Assumes that topology has already been initialized
+		"""
 		sumP = 0.0
 		for Si in self.getStates():
 			p = random.random() # [0,1)
@@ -124,12 +126,14 @@ class HiddenMarkovModel(object):
 	def _initHMMEmitRand(self, vocabulary):
 		""" Assigns random emission per state 
 			vocabulary is a set
+			Assumes that topology has already been initialized
 		"""
+		print vocabulary
 		for Si in self.getStates():
 			self.hmmEmit[Si] = dict.fromkeys(vocabulary)
 
+			sumP = 0.0
 			for word in vocabulary:
-				sumP = 0.0
 
 				p = random.random() # [0,1)
 				if p == 0.0:
@@ -143,12 +147,13 @@ class HiddenMarkovModel(object):
 				self.hmmEmit[Si][word] = self.hmmEmit[Si][word] / sumP
 
 	def _initHMMTransRand(self):
-		""" Assigns random transition prob per state """
+		""" Assigns random transition prob per state 
+			Assumes that topology has already been initialized
+		"""
 		for Si in self.getStates():
-			self.hmmTrans[Si] = dict.fromkeys(vocabulary)
 
+			sumP = 0.0
 			for Sj in self.getStates():
-				sumP = 0.0
 
 				p = random.random() # [0,1)
 				if p == 0.0:
@@ -331,30 +336,71 @@ class HiddenMarkovModel(object):
 # Baum-Welch Algorithm
 #===============================================
 
-def baumWelchAlg(self, trainFileName, transFileName = None, emitFileName = None,
-				 priorFileName = None, delim = ' ', maxIterStep = 0.1,
-				 maxNIter = 20):
-	""" Takes in training data and generates HMM model. Starting HMM parameters
-		can be specified through the assorted files. Training convergence 
-		parameters can also be specified.
-	"""
+	def baumWelchAlg(self, trainingData, printAvgLL = True , minAvgLLDelta = 0.1,	
+					 maxNIter = 20):
+		""" Takes in training data and generates HMM model. Starting HMM parameters
+			can be specified through the assorted files. Training convergence 
+			parameters can also be specified.
+			trainingData is a list of sentence lists.
+		"""
+		if not self.bInitializedTopology:
+			raise("Cannot train without initialized topology")
 
-	# place training data in list of sentence lists
-	with open(trainFileName) as FID:
-		trainingData = list()
-		vocabulary = set() # vocabulary contains unique words
-		for line in FID:
-			data = line.strip().split(delim)
-			trainingData.append( data )
-			vocabulary.union(set(data))
+		# iterate on algorithm until avg LL converges or the maximum number 
+		#  of iterations are made
+		nIter = 0
+		avgLLDelta = minAvgLLDelta
+		# TODO prealloc xi and gamma to make faster
+		while ( (nIter < maxNIter) and (avgLLDelta >= minAvgLLDelta) ):
 
-	# Step 1: Initialize HMM
-	if (transFileName != None and emitFileName != None and 
-			priorFileName != None):
-		self.initHMM(transFileName, emitFileName, priorFileName, delim)
-	else:
-		# random value generated for probabilities in state model
-		self._initHMMRand()
+			# clear every iteration
+			xi = list()
+			gamma = list()
+
+			for m in xrange(0,len(trainingData)):
+				# iterate through all training data to get values xi and gamma
+				# per observed vector
+				# xi is the expected probability of transitioning state i->j
+				#  xi = list(vObserved)< list(time)< dict<Si, dict<Sj,prob> > > >
+				# gamma is the expected probability of passing through state i 
+				#  gamma = list(vObserved)< list(time)< dict<Si, prob> > >
+				
+				vObserved = trainingData[m]
+
+				# get alpha and beta values for current HMM configuration
+				alpha = self._getAlpha(vObserved)
+				beta  = self._getBeta(vObserved)
+
+				# calculate xi and gamma
+				# rtrn matrix over time for Si->Sj
+				xi[m] = self._getXi(alpha, beta, vObserved)
+				# rtrn vector over time for Si
+				gamma[m] = self._getGamma(alpha, beta)
+
+			for m in xrange(0,len(trainingData)):
+				# update HMM
+
+				# TODO
+				pass
+
+			# caclulate average log likelihood
+
+			# TODO
+
+	def _getXi(self, alpha, beta, vObserved):
+		""" Return matrix over time for Si->Sj
+			Given alpha, beta and vObserved which are all over time
+		"""	
+
+
+	def _getGamma(self, alpha, beta):
+		""" Return matrix over time for Si
+			Given alpha and beta which are all over time
+		"""	
+		gamma = 
+
+		return gamma
+
 
 #===============================================
 # Getters
