@@ -373,9 +373,9 @@ class HiddenMarkovModel(object):
 
 				# calculate xi and gamma
 				# rtrn matrix over time for Si->Sj
-				xi[m] = self._getXi(alpha, beta, vObserved)
+				xi[m] = self._getXiM(alpha, beta, vObserved)
 				# rtrn vector over time for Si
-				gamma[m] = self._getGamma(alpha, beta)
+				gamma[m] = self._getGammaM(alpha, beta)
 
 			for m in xrange(0,len(trainingData)):
 				# update HMM
@@ -387,17 +387,64 @@ class HiddenMarkovModel(object):
 
 			# TODO
 
-	def _getXi(self, alpha, beta, vObserved):
+	def _getXiM(self, alpha, beta, vObserved):
 		""" Return matrix over time for Si->Sj
 			Given alpha, beta and vObserved which are all over time
 		"""	
+		T = len(alpha)
+		xi = [None] * T
+
+		# iterate over time and state i and then state j to calculate the 
+		# probability of transitioning i->j @ t.
+		# Note that iterate up to T-1
+		for t in xrange(0,T-1):
+
+			totalProb = 0.0
+			ot_1 = vObserved[t+1]
+			xi[t] = dict.fromkeys(self.getStates())
+
+			# iterate state by state @ t
+			for Si in self.getStates():
+
+				totalProb += alpha[t][Si] * beta[t][Si]
+
+				xi[t][Si] = dict.fromkeys(self.getStates())
+
+				# iterate over states that Si can transition to @ t
+				for Sj  in self.getStates():
+
+					xi[t][Si][Sj] = alpha[t][Si] * self.hmmTrans[Si][Sj] * self.hmmEmit[Sj][ot_1] * beta[t+1][Sj]
+
+			# normalize probabilities
+			for Si in self.getStates():
+				for Sj  in self.getStates():
+					xi[t][Si][Sj] = xi[t][Si][Sj] / totalProb
 
 
-	def _getGamma(self, alpha, beta):
+	def _getGammaM(self, alpha, beta):
 		""" Return matrix over time for Si
 			Given alpha and beta which are all over time
 		"""	
-		gamma = 
+		T = len(alpha)
+		gamma = [None] * T
+
+		# iterate over time and state to calulate probability of being at that
+		# state and that time. Also keep track of total prob at given times to
+		# normalized by at the end.
+		for t in xrange(0,T):
+			
+			totalProb = 0.0
+			gamma[t] = dict.fromkeys(self.getStates())
+
+			# calculate probability
+			for Si in self.getStates():
+				prob = alpha[t][Si] * beta[t][Si]
+				gamma[t][Si] = prob
+				totalProb += prob
+
+			# normalized probability
+			for Si in self.getStates():
+				gamma[t][Si] = gamma[t][Si] / totalProb
 
 		return gamma
 
