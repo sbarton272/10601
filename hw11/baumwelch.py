@@ -4,7 +4,7 @@
 
 import sys, HMM, math
 
-DEBUG = True
+DEBUG = False
 
 STATES = ['PR', 'VB', 'RB', 'NN', 'PC', 'JJ', 'DT', 'OT']
 
