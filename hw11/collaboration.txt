@@ -3,5 +3,5 @@ Spencer Barton
 HW 11
 collaboration.txt
 
-I worked with Justin Frye to understand the various algorithms of the HMM. We went over lecture and recitation slides to understand the forward, backward, Viterbi and Baum-Welsch algorithms. We worked through the examples from the class notes together as well as an example for Viterbi that we found online.
+I worked with Justin Frye to understand the various algorithms of the HMM before we started coding. We went over lecture and recitation slides to understand the forward, backward, Viterbi and Baum-Welsch algorithms. We worked through the examples from the class notes together as well as an example for Viterbi that we found online. Specifically we taked about the backtracing path generation in an example we found online that had a Viterbi table filled-out. After we started coding, Justin also asked me about where to get the states for the baum-welch random initialization. I directed him to piazza.
 
