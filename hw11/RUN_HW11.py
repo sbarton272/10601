@@ -26,9 +26,9 @@ def runCmd(cmd):
 # VP = runCmd(['python','viterbi.py', './test/test-dev.txt', './test/test-trans.txt', './test/test-emit.txt', './test/test-prior.txt'])
 # runCmd(['python','viterbi.py', 'test/test3-dev.txt', 'test/test3-trans.txt', 'test/test3-emit.txt', 'test/test3-prior.txt'])
 
-print 'Baum Welch Test Data'
-runCmd(['python','baumwelch.py', './test/test4-train.txt', './test/test4-trans.txt', './test/test4-emit.txt', './test/test4-prior.txt'])
-runCmd(['python','baumwelch.py', './test/test2-dev.txt'])
+# print 'Baum Welch Test Data'
+runCmd(['python','baumwelch.py', './test/test4-train-small.txt', './test/test4-trans.txt', './test/test4-emit.txt', './test/test4-prior.txt'])
+# runCmd(['python','baumwelch.py', './test/test2-dev.txt'])
 
 # print 'Correctness:'
 # print 'Fwd', alpha == beta
@@ -50,10 +50,9 @@ runCmd(['python','baumwelch.py', './test/test2-dev.txt'])
 # with open(outFile, 'w') as FID:
 # 	FID.write(paths)
 
-print 'Baum Welch Real Data'
-runCmd(['python','baumwelch.py', 'train.txt', 'hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt'])
-runCmd(['python','baumwelch.py', 'train.txt'])
-
+# print 'Baum Welch Real Data'
+# runCmd(['python','baumwelch.py', 'train.txt', 'hmm-trans.txt', 'hmm-emit.txt', 'hmm-prior.txt'])
+# res.append( runCmd(['python','baumwelch.py', 'train.txt']) )
 
 # print 'Correctness:'
 # print 'Fwd-Bckwd', fwdRes == bckwdRes

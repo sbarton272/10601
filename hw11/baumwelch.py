@@ -44,7 +44,7 @@ if DEBUG:
 	print 'states', HMM.getStates()
 	print 'observables', HMM.getObservables()
 
-HMM.baumWelchAlg(trainingData)
+avgLL = HMM.baumWelchAlg(trainingData, True)
 
 # for debug
 if DEBUG:
