@@ -382,72 +382,12 @@ class HiddenMarkovModel(object):
 				# get alpha and beta values for current HMM configuration
 				alpha = self._getAlpha(vObserved)
 				beta  = self._getBeta(vObserved)
-				
-				# DEBUG
-				# if m == 0:
-				# 	alpha = [{'s': 0.34, 't': 0.08}, {'s': 0.066, 't': 0.155}, {'s': 0.02118, 't': 0.09285}, {'s': 0.00625, 't': 0.04919}]
-				# 	beta = [{'s': 0.13315, 't': 0.12729}, {'s': 0.2561, 't': 0.2487}, {'s': 0.47, 't': 0.49}, {'s': 1.0, 't': 1.0}]
-				# else:
-				# 	alpha = [{'s': 0.51, 't': 0.08}, {'s': 0.0644, 't': 0.2145}, {'s': 0.0209, 't': 0.119}]
-				# 	beta = [{'s': 0.2421, 't': 0.2507}, {'s': 0.53, 't': 0.51}, {'s': 1.0, 't': 1.0}]
-
-				# print '----------'
-				# print vObserved, self.forwardAlg(vObserved)
 
 				# calculate xi and gamma
 				# rtrn matrix over time for Si->Sj
 				xi[m] = self._getXiM(alpha, beta, vObserved)
 				# rtrn vector over time for Si
 				gamma[m] = self._getGammaM(alpha, beta)
-
-				# print 'alpha', alpha
-				# print 'beta', beta
-				# print 'xi'
-				for x in xi[m]:
-					# print x
-					pass
-				# print 'gamma'
-				for g in gamma[m]:
-					# print g
-					pass
-				# print '----------'
-
-
-			# xi[0][0]['s']['s'] = 0.28271
-			# xi[0][0]['s']['t'] = 0.53383
-			# xi[0][0]['t']['s'] = 0.02217
-			# xi[0][0]['t']['t'] = 0.16149
-			# xi[0][1]['s']['s'] = 0.10071
-			# xi[0][1]['s']['t'] = 0.20417
-			# xi[0][1]['t']['s'] = 0.07884
-			# xi[0][1]['t']['t'] = 0.61648
-			# xi[0][2]['s']['s'] = 0.04584
-			# xi[0][2]['s']['t'] = 0.13371
-			# xi[0][2]['t']['s'] = 0.06699
-			# xi[0][2]['t']['t'] = 0.75365
-			# xi[1][0]['s']['s'] = 0.23185
-			# xi[1][0]['s']['t'] = 0.65071
-			# xi[1][0]['t']['s'] = 0.01212
-			# xi[1][0]['t']['t'] = 0.13124
-			# xi[1][1]['s']['s'] = 0.08286
-			# xi[1][1]['s']['t'] = 0.16112
-			# xi[1][1]['t']['s'] = 0.09199
-			# xi[1][1]['t']['t'] = 0.68996
-
-			# gamma[0][0]['s'] = 0.81654
-			# gamma[0][0]['t'] = 0.18366
-			# gamma[0][1]['s'] = 0.30488
-			# gamma[0][1]['t'] = 0.69532
-			# gamma[0][2]['s'] = 0.17955
-			# gamma[0][2]['t'] = 0.82064
-			# gamma[0][3]['s'] = 0.11273
-			# gamma[0][3]['t'] = 0.88727
-			# gamma[1][0]['s'] = 0.88256
-			# gamma[1][0]['t'] = 0.14336
-			# gamma[1][1]['s'] = 0.24398
-			# gamma[1][1]['t'] = 0.78195
-			# gamma[1][2]['s'] = 0.14939
-			# gamma[1][2]['t'] = 0.85061
 
 			# update HMM after looking at all training data
 			self._updateHmmPrior(gamma)
@@ -486,7 +426,6 @@ class HiddenMarkovModel(object):
 			for m in xrange(0,M):
 				# sum all prob over samples of going though state Si at t=0
 				probSum += gamma[m][0][Si]
-				# print 'pi', Si, m, gamma[m][0][Si]
 
 			self.hmmPrior[Si] = probSum / M
 
@@ -510,8 +449,6 @@ class HiddenMarkovModel(object):
 						prob = xi[m][t][Si][Sj]
 						numerator += prob
 						denominator += prob
-
-						# print 'aij', Si, Sj, m, t, T, prob 
 
 				self.hmmTrans[Si][Sj] = numerator
 
@@ -544,8 +481,6 @@ class HiddenMarkovModel(object):
 							# of training data is vk
 							numerator += prob
 
-						# print 'bivk', Si, vk, m, t, prob, ot==vk
-
 				self.hmmEmit[Si][vk] = numerator / denominator
 
 	def _getXiM(self, alpha, beta, vObserved):
@@ -573,15 +508,8 @@ class HiddenMarkovModel(object):
 
 				# iterate over states that Si can transition to @ t
 				for Sj  in self.getStates():
-
-					# print 'xi:', t, Si, Sj
-					# print '\t', alpha[t][Si], self.hmmTrans[Si][Sj], self.hmmEmit[Sj][ot_1], beta[t+1][Sj],
-
 					xi[t][Si][Sj] = alpha[t][Si] * self.hmmTrans[Si][Sj] * self.hmmEmit[Sj][ot_1] * beta[t+1][Sj]
 
-					# print xi[t][Si][Sj]
-
-			# print '\t>', totalProb
 			# normalize probabilities
 			for Si in self.getStates():
 				for Sj  in self.getStates():

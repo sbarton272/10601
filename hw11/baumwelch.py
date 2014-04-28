@@ -38,6 +38,7 @@ else:
 
 # for debug
 if DEBUG:
+	print 'Before training'
 	print 'prior', HMM.hmmPrior
 	print 'trans', HMM.hmmTrans
 	print 'emit', HMM.hmmEmit
@@ -48,6 +49,7 @@ avgLL = HMM.baumWelchAlg(trainingData, True)
 
 # for debug
 if DEBUG:
+	print 'After training'
 	print 'prior', HMM.hmmPrior
 	print 'trans', HMM.hmmTrans
 	print 'emit', HMM.hmmEmit
